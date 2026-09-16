@@ -79,6 +79,11 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .hero-text p{font-size:16px;color:var(--metal-dark);line-height:1.6;margin-bottom:28px;max-width:440px;}
 .eyebrow{display:inline-block;font-size:12.5px;color:var(--orange-dark);font-weight:500;background:#EAF0F9;padding:6px 14px;border-radius:20px;margin-bottom:20px;}
 .hero-ctas{display:flex;gap:10px;}
+.hero-stats{display:flex;gap:28px;margin-top:26px;padding-top:22px;border-top:1px solid var(--line);}
+.hero-stats div{display:flex;flex-direction:column;}
+.hero-stats strong{font-family:'Roboto Slab',serif;font-size:16px;}
+.hero-stats span{font-size:12px;color:var(--metal);margin-top:2px;}
+.review-empty-icon{color:#ffffff40;margin-bottom:12px;}
 .hero-visual{display:flex;justify-content:center;}
 .reviews-card{background:var(--ink);border-radius:14px;padding:28px;width:100%;max-width:340px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;}
 .reviews-title{color:var(--paper);font-size:12px;letter-spacing:.02em;margin:0 0 18px;opacity:.6;font-weight:500;text-transform:uppercase;}
@@ -202,6 +207,16 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .empty-state p{font-size:13.5px;color:var(--metal);margin:0 0 18px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;}
 footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px solid var(--line);text-align:center;}
 
+.site-footer{border-top:1px solid var(--line);margin-top:8px;}
+.footer-top{max-width:1080px;margin:0 auto;padding:36px 32px 24px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:24px;}
+.footer-brand .logo{font-size:17px;margin-bottom:8px;}
+.footer-brand p{font-size:12.5px;color:var(--metal);line-height:1.5;max-width:260px;}
+.footer-title{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--metal);margin-bottom:10px;font-weight:600;}
+.footer-link{display:block;font-size:13px;color:var(--metal-dark);text-decoration:none;cursor:pointer;margin-bottom:8px;}
+.footer-link:hover{color:var(--ink);}
+.footer-bottom{border-top:1px solid var(--line);padding:16px 32px;text-align:center;font-size:11.5px;color:var(--metal);}
+@media(max-width:640px){ .footer-top{grid-template-columns:1fr;} }
+
 @media(max-width:720px){
   .hero h1{font-size:28px;}
   .choice-cards{grid-template-columns:1fr;}
@@ -242,20 +257,27 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="wrap">
     <div class="hero-split">
       <div class="hero-text">
-        <span class="eyebrow">Actuellement en test - secteur Vienne / Lyon</span>
+        <span class="eyebrow">Secteur Vienne / Lyon</span>
         <h1>Une place de garage pour ta moto cet hiver, chez un motard du coin.</h1>
         <p>GaroMoto met en relation les motards qui ont une place de garage libre avec ceux qui en cherchent une pour l'hivernage. Crée un compte pour signaler ton besoin ou proposer ta place.</p>
         <div class="hero-ctas">
           <button class="btn primary" onclick="openAuth('signup','client')">Je cherche une place</button>
           <button class="btn ghost" onclick="openAuth('signup','owner')">Je propose ma place</button>
         </div>
+        <div class="hero-stats">
+          <div><strong>35-70 €</strong><span>par mois selon la formule</span></div>
+          <div><strong>Sans engagement</strong><span>résilie quand tu veux</span></div>
+        </div>
       </div>
       <div class="hero-visual">
         <div class="reviews-card">
-          <p class="reviews-title">Avis vérifiés</p>
+          <p class="reviews-title">Communauté GaroMoto</p>
           <div class="reviews-track" id="reviews-track">
             <div class="review-slide active">
-              <p class="review-text">Les avis de nos utilisateurs s'afficheront ici dès les premières réservations confirmées.</p>
+              <div class="review-empty-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 21c-4.4-2.8-8-6.4-8-10.5A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 8 4.5c0 4.1-3.6 7.7-8 10.5z"/></svg>
+              </div>
+              <p class="review-text">Les avis de nos premiers utilisateurs s'afficheront ici dès les premières réservations confirmées.</p>
             </div>
           </div>
           <div class="reviews-dots" id="reviews-dots"></div>
@@ -291,23 +313,27 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       </div>
     </div>
   </div>
-  <footer class="site">GaroMoto - plateforme en phase de test, secteur Vienne / Lyon.</footer>
-</div>
-
-<!-- PUBLIC SEARCH (sans connexion) -->
-<div id="view-public-search" class="view">
-  <div class="wrap" style="padding:36px 32px 56px;">
-    <h1 style="font-size:24px;margin-bottom:6px;">Places disponibles autour de Vienne</h1>
-    <p class="sub" style="margin-bottom:24px;">Crée un compte pour réserver une place ou être mis en relation.</p>
-    <table style="margin-bottom:28px">
-      <tr><th>Garage</th><th>Distance</th><th>Note</th><th>Tarif</th><th></th></tr>
-      <tr><td>Garage de Julien</td><td>2,4 km</td><td>4.8 ★</td><td>45 €/mois</td><td><button class="btn small primary" onclick="openAuth('signup','client')">Réserver</button></td></tr>
-      <tr><td>Box sécurisé Sud-Vienne</td><td>6,1 km</td><td>4.8 ★</td><td>55 €/mois</td><td><button class="btn small primary" onclick="openAuth('signup','client')">Réserver</button></td></tr>
-      <tr><td>Hangar de Mathieu</td><td>9,8 km</td><td>4.6 ★</td><td>70 €/mois</td><td><button class="btn small primary" onclick="openAuth('signup','client')">Réserver</button></td></tr>
-    </table>
-    <div class="notice">Tu dois créer un compte pour finaliser une réservation - c'est gratuit et ça prend deux minutes.</div>
-  </div>
-  <footer class="site">GaroMoto - plateforme en phase de test, secteur Vienne / Lyon.</footer>
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="logo">Garo<span>Moto</span></div>
+        <p>Mise en relation entre motards pour l'hivernage, secteur Vienne / Lyon.</p>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Légal</p>
+        <span class="footer-link" onclick="openLegal('cgu')">CGU</span>
+        <span class="footer-link" onclick="openLegal('cgv')">CGV</span>
+        <span class="footer-link" onclick="openLegal('confidentialite')">Confidentialité</span>
+        <span class="footer-link" onclick="openLegal('mentions')">Mentions légales</span>
+      </div>
+      <div class="footer-col">
+        <p class="footer-title">Suivre GaroMoto</p>
+        <a class="footer-link" href="#" target="_blank" rel="noopener">Instagram</a>
+        <a class="footer-link" href="#" target="_blank" rel="noopener">Facebook</a>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 GaroMoto - secteur Vienne / Lyon.</div>
+  </footer>
 </div>
 
 <!-- DASHBOARD CLIENT -->
@@ -601,6 +627,15 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   </div>
 </div>
 
+<!-- LEGAL MODAL -->
+<div class="overlay" id="legal-overlay">
+  <div class="modal" style="max-width:520px;max-height:80vh;overflow-y:auto;">
+    <button class="modal-close" onclick="document.getElementById('legal-overlay').classList.remove('open')">✕</button>
+    <h2 id="legal-title" style="font-size:19px;margin-bottom:14px;"></h2>
+    <div id="legal-body" style="font-size:14px;color:var(--metal-dark);line-height:1.6;"></div>
+  </div>
+</div>
+
 <!-- ETAT DES LIEUX MODAL -->
 <div class="overlay" id="inspection-overlay">
   <div class="modal" style="max-width:520px;">
@@ -819,11 +854,6 @@ async function tryAutoLogin(){
 function goLanding(){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-landing').classList.add('active');
-  closeDropdown();
-}
-function showPublicSearch(){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  document.getElementById('view-public-search').classList.add('active');
   closeDropdown();
 }
 function goDashboard(){
@@ -1305,6 +1335,34 @@ async function uploadIdentityDocument(){
   if(error){ alert('Erreur : ' + error.message); return; }
   document.getElementById('identity-file').value = '';
   await openIdentityModal();
+}
+
+/* MENTIONS LEGALES */
+const LEGAL_CONTENT = {
+  cgu: {
+    title: 'Conditions Générales d\'Utilisation',
+    body: '<p>Ces conditions générales d\'utilisation encadrent l\'usage de la plateforme GaroMoto par les clients et les propriétaires de garage.</p><p style="margin-top:10px;color:var(--orange-dark);">Document en cours de rédaction - une version complète sera publiée avant l\'ouverture au public.</p>'
+  },
+  cgv: {
+    title: 'Conditions Générales de Vente',
+    body: '<p>Ces conditions générales de vente encadrent les réservations, les tarifs, la commission de la plateforme et les modalités de résiliation.</p><p style="margin-top:10px;color:var(--orange-dark);">Document en cours de rédaction - une version complète sera publiée avant l\'ouverture au public.</p>'
+  },
+  confidentialite: {
+    title: 'Politique de confidentialité',
+    body: '<p>GaroMoto collecte uniquement les données nécessaires au fonctionnement du service : identité pour la vérification, informations de réservation, et messages échangés entre utilisateurs liés à une réservation.</p><p style="margin-top:10px;color:var(--orange-dark);">Document en cours de rédaction, conforme au RGPD - une version complète sera publiée avant l\'ouverture au public.</p>'
+  },
+  mentions: {
+    title: 'Mentions légales',
+    body: '<p>Éditeur du site : GaroMoto.</p><p style="margin-top:10px;color:var(--orange-dark);">Informations légales complètes (SIRET, hébergeur, responsable de publication) à venir avant l\'ouverture au public.</p>'
+  }
+};
+
+function openLegal(key){
+  const content = LEGAL_CONTENT[key];
+  if(!content) return;
+  document.getElementById('legal-title').textContent = content.title;
+  document.getElementById('legal-body').innerHTML = content.body;
+  document.getElementById('legal-overlay').classList.add('open');
 }
 
 /* MESSAGERIE */
