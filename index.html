@@ -1405,10 +1405,19 @@ async function loadAdminListings(){
   if(error){ el.innerHTML = '<p class="sub">Erreur : ' + error.message + '</p>'; return; }
   if(!data || !data.length){ el.innerHTML = '<p class="sub">Aucun garage enregistré.</p>'; return; }
   const trs = data.map(r => {
-    const statusBadge = r.status==='published' ? '<span class="badge ok">Publié</span>' : '<span class="badge pending">En attente</span>';
-    return '<tr><td>'+r.garage_name+'</td><td>'+r.city+'</td><td>'+r.total_slots+'</td><td>'+r.price_per_month+' €/mois</td><td>'+statusBadge+'</td></tr>';
+    const statusBadge = r.status==='published' ? '<span class="badge ok">Publié</span>' : r.status==='suspended' ? '<span class="badge flag">Suspendu</span>' : '<span class="badge pending">En attente</span>';
+    const action = r.status==='published'
+      ? '<button class="btn small ghost" onclick="setGarageStatus(\''+r.garage_id+'\',\'suspended\')">Suspendre</button>'
+      : '<button class="btn small primary" onclick="setGarageStatus(\''+r.garage_id+'\',\'published\')">Approuver</button>';
+    return '<tr><td>'+r.garage_name+'</td><td>'+r.city+'</td><td>'+r.total_slots+'</td><td>'+r.price_per_month+' €/mois</td><td>'+statusBadge+'</td><td>'+action+'</td></tr>';
   }).join('');
-  el.innerHTML = '<table><tr><th>Garage</th><th>Ville</th><th>Places</th><th>Tarif</th><th>Statut</th></tr>'+trs+'</table>';
+  el.innerHTML = '<table><tr><th>Garage</th><th>Ville</th><th>Places</th><th>Tarif</th><th>Statut</th><th></th></tr>'+trs+'</table>';
+}
+
+async function setGarageStatus(garageId, status){
+  const { error } = await sb.from('garages').update({ status }).eq('id', garageId);
+  if(error){ alert('Erreur : ' + error.message); return; }
+  loadAdminListings();
 }
 
 async function loadAdminDisputes(){
