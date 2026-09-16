@@ -204,6 +204,10 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .slot-tile.free{background:#EDF4EE;color:var(--green);border-color:#CCE1CE;}
 .slot-tile.booked{background:var(--paper);color:var(--metal);}
 .add-slot{width:48px;height:48px;border:1.5px dashed var(--metal);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--metal);background:none;font-size:17px;}
+.slot-tile.deletable{position:relative;cursor:pointer;}
+.slot-tile.deletable .slot-x{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--orange-dark);color:#fff;font-size:11px;line-height:16px;text-align:center;opacity:0;transition:opacity .12s;}
+.slot-tile.deletable:hover .slot-x{opacity:1;}
+.slot-tile.deletable:hover{background:#FADEDA;color:var(--orange-dark);border-color:#F0B8AE;}
 
 .notice{background:#FBF3E4;border:1px solid #EEDCB6;border-radius:8px;padding:12px 16px;font-size:13px;color:#7A5A1E;margin-bottom:20px;}
 .empty-state{text-align:center;padding:52px 24px;border:1px dashed var(--line-strong);border-radius:10px;}
@@ -981,14 +985,15 @@ async function submitLogin(e){
   return false;
 }
 
-async function afterAuth(){
+async function afterAuth(navigate){
+  if(navigate === undefined) navigate = true;
   const { data: { user } } = await sb.auth.getUser();
   if(!user) return;
   const { data: profile, error } = await sb.from('profiles').select('full_name, role').eq('id', user.id).single();
   if(error || !profile){ console.error(error); return; }
   applySession(profile.full_name || user.email, profile.role, user.id);
   closeAuth();
-  goDashboard();
+  if(navigate) goDashboard();
 }
 
 function applySession(name, role, userId){
@@ -1004,7 +1009,9 @@ function applySession(name, role, userId){
 
 async function tryAutoLogin(){
   const { data: { session } } = await sb.auth.getSession();
-  if(session && session.user) await afterAuth();
+  // Reste connecté (menu utilisateur actif) mais reste sur la landing page
+  // plutôt que de renvoyer automatiquement vers le dashboard à chaque rafraîchissement.
+  if(session && session.user) await afterAuth(false);
 }
 
 function goLanding(){
@@ -1319,7 +1326,9 @@ async function loadOwnerGarages(){
     const bookedCount = (g.slots||[]).filter(s => (s.bookings||[]).some(b=>b.status==='confirmed'||b.status==='pending')).length;
     const slotsHtml = (g.slots||[]).map(s => {
       const booked = (s.bookings||[]).some(b=>b.status==='confirmed'||b.status==='pending');
-      return '<div class="slot-tile '+(booked?'booked':'free')+'">'+s.label+'</div>';
+      return booked
+        ? '<div class="slot-tile booked">'+s.label+'</div>'
+        : '<div class="slot-tile free deletable" onclick="deleteGarageSlot(\''+s.id+'\',\''+g.id+'\')" title="Supprimer cette place">'+s.label+'<span class="slot-x">×</span></div>';
     }).join('');
     const optKeys = (g.garage_options||[]).map(o=>o.option_key);
     const optsHtml = Object.keys(OPTION_LABELS).map(k =>
@@ -1327,14 +1336,33 @@ async function loadOwnerGarages(){
     ).join('');
     return '<div class="card">'
       + '<div class="card-row"><div><h3>'+g.name+'</h3><div class="meta">'+g.city+' - '+(g.slots||[]).length+' places - '+g.price_per_month+' €/mois'
-      + (g.status==='pending' ? ' <span class="badge pending" style="margin-left:6px;">En attente de validation</span>' : '') + '</div></div></div>'
-      + '<p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>'
+      + (g.status==='pending' ? ' <span class="badge pending" style="margin-left:6px;">En attente de validation</span>' : '') + '</div></div>'
+      + '<button class="btn small ghost cancel-btn" onclick="deleteGarage(\''+g.id+'\',\''+bookedCount+'\')">Supprimer le garage</button></div>'
+      + '<p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places <span style="font-weight:400;">(clique sur une place libre pour la retirer)</span></p>'
       + '<div class="slots-editor" id="slots-'+g.id+'">'+slotsHtml+'<button class="add-slot" onclick="addGarageSlot(\''+g.id+'\')">+</button></div>'
       + '<p class="meta" style="margin-bottom:16px;">'+bookedCount+' places réservées sur '+(g.slots||[]).length+'.</p>'
       + '<p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>'
       + '<div class="search-row" style="margin-bottom:0;">'+optsHtml+'</div>'
       + '</div>';
   }).join('');
+}
+
+async function deleteGarageSlot(slotId, garageId){
+  if(!confirm('Retirer cette place ? Elle ne sera plus proposée aux clients.')) return;
+  const { error } = await sb.from('slots').delete().eq('id', slotId);
+  if(error){ alert('Erreur : ' + error.message); return; }
+  loadOwnerGarages();
+}
+
+async function deleteGarage(garageId, bookedCount){
+  const warning = Number(bookedCount) > 0
+    ? 'Ce garage a '+bookedCount+' place(s) actuellement réservée(s). Le supprimer annulera ces réservations. Continuer ?'
+    : 'Supprimer ce garage définitivement ? Cette action est irréversible.';
+  if(!confirm(warning)) return;
+  const { error } = await sb.from('garages').delete().eq('id', garageId);
+  if(error){ alert('Erreur : ' + error.message); return; }
+  showToast('Garage supprimé.');
+  loadOwnerGarages();
 }
 
 async function geocodeCity(city){
