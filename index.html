@@ -14,13 +14,13 @@
   --card:#FFFFFF;
 }
 *{box-sizing:border-box;}
-body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
+body{margin:0;background:var(--paper) radial-gradient(circle at 15% 0%, #EDF1F7 0%, var(--paper) 45%);color:var(--ink);font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased;}
 h1,h2,h3{font-family:'Roboto Slab',serif;font-weight:700;margin:0;}
 .wrap{max-width:1080px;margin:0 auto;}
 a{color:inherit;}
 
 /* NAV */
-header.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:30;}
+header.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 32px;border-bottom:1px solid var(--line);background:var(--card);position:sticky;top:0;z-index:30;box-shadow:0 1px 0 rgba(20,25,35,.03),0 4px 14px rgba(20,25,35,.04);}
 .logo{font-size:20px;cursor:pointer;}
 .logo span{color:var(--orange);}
 .nav-right{display:flex;align-items:center;gap:14px;}
@@ -30,13 +30,16 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .btn:hover{background:var(--ink);color:var(--paper);}
 .btn.primary{background:var(--orange);color:#fff;border-color:var(--orange);}
 .btn.primary:hover{background:var(--orange-dark);border-color:var(--orange-dark);color:#fff;box-shadow:0 2px 10px #2F5DAA33;}
+.confirm-danger-btn{background:#D9482E !important;border-color:#D9482E !important;}
+.confirm-danger-btn:hover{background:#B93A24 !important;border-color:#B93A24 !important;}
 .btn.ghost{border-color:var(--line-strong);color:var(--metal-dark);background:#fff;}
 .btn.ghost:hover{background:var(--paper);color:var(--ink);border-color:var(--metal);}
 .btn.small{padding:6px 12px;font-size:13px;}
 .btn.block{width:100%;}
 
-.user-chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line-strong);border-radius:24px;padding:5px 14px 5px 5px;cursor:pointer;background:#fff;position:relative;}
-.avatar{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;font-family:'Roboto Slab',serif;}
+.user-chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line-strong);border-radius:24px;padding:5px 14px 5px 5px;cursor:pointer;background:#fff;position:relative;transition:box-shadow .15s;}
+.user-chip:hover{box-shadow:0 3px 10px rgba(20,25,35,.08);}
+.avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--ink),#324255);color:var(--paper);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;font-family:'Roboto Slab',serif;}
 .user-chip .name{font-size:13px;font-weight:500;}
 .chevron{font-size:10px;color:var(--metal);}
 .dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.08);min-width:200px;display:none;overflow:hidden;z-index:40;}
@@ -49,7 +52,7 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 /* MODAL AUTH */
 .overlay{position:fixed;inset:0;background:rgba(20,18,14,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px;}
 .overlay.open{display:flex;}
-.modal{background:#fff;border-radius:14px;width:100%;max-width:400px;padding:32px;position:relative;}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:400px;padding:32px;position:relative;box-shadow:0 24px 60px rgba(15,18,25,.28);}
 .modal-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:18px;cursor:pointer;color:var(--metal);}
 .modal h2{font-size:21px;margin-bottom:6px;}
 .modal .sub{font-size:13px;color:var(--metal);margin-bottom:22px;}
@@ -80,6 +83,13 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .star-picker .star.filled{color:#E8B84B;}
 .review-done{font-size:12.5px;color:var(--green);font-weight:500;}
 .cancel-btn{color:var(--orange-dark);border-color:var(--line-strong);}
+
+.confirm-modal{max-width:380px;text-align:center;padding:32px;}
+.confirm-icon{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+.confirm-icon.danger{background:#FADEDA;color:var(--orange-dark);}
+.confirm-icon.info{background:#EAF0F9;color:var(--orange);}
+.confirm-icon.success{background:#E6F0E7;color:var(--green);}
+.confirm-icon.error{background:#FADEDA;color:var(--orange-dark);}
 
 /* ASSISTANT D'AIDE */
 .help-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.2);z-index:150;transition:transform .15s;}
@@ -125,7 +135,7 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .hero-stats span{font-size:12px;color:var(--metal);margin-top:2px;}
 .review-empty-icon{color:#ffffff40;margin-bottom:12px;}
 .hero-visual{display:flex;justify-content:center;}
-.reviews-card{background:var(--ink);border-radius:14px;padding:28px;width:100%;max-width:340px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;}
+.reviews-card{background:var(--ink);border-radius:14px;padding:28px;width:100%;max-width:340px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 20px 44px rgba(27,36,48,.28);}
 .reviews-title{color:var(--paper);font-size:12px;letter-spacing:.02em;margin:0 0 18px;opacity:.6;font-weight:500;text-transform:uppercase;}
 .reviews-track{position:relative;flex:1;}
 .review-slide{display:none;}
@@ -146,7 +156,8 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 /* LANDING (legacy, kept for compat) */
 
 .choice-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 32px 56px;}
-.choice-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;transition:border-color .15s;}
+.choice-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;transition:box-shadow .18s,border-color .18s,transform .18s;box-shadow:0 1px 3px rgba(20,25,35,.05);}
+.choice-card:hover{border-color:var(--line-strong);box-shadow:0 10px 26px rgba(20,25,35,.09);transform:translateY(-2px);}
 .choice-card:hover{border-color:var(--line-strong);}
 .choice-card .icon{width:40px;height:40px;border-radius:10px;background:#EAF0F9;color:var(--orange-dark);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
 .choice-card h3{font-size:18px;margin-bottom:8px;}
@@ -164,7 +175,7 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .sidebar{border-right:1px solid var(--line);padding:22px 14px;}
 .side-item{padding:9px 14px;font-size:13.5px;border-radius:7px;cursor:pointer;color:var(--metal-dark);margin-bottom:2px;transition:background .12s;}
 .side-item:hover{background:var(--paper);}
-.side-item.active{background:var(--ink);color:var(--paper);font-weight:500;}
+.side-item.active{background:var(--ink);color:var(--paper);font-weight:500;box-shadow:0 3px 10px rgba(27,36,48,.25);}
 .side-label{font-size:11px;color:var(--metal);text-transform:uppercase;letter-spacing:.03em;padding:0 14px;margin:14px 0 8px;}
 .main{padding:28px 32px;}
 .tabpanel{display:none;}
@@ -174,7 +185,9 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .sub{font-size:13.5px;color:var(--metal);}
 
 .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-.metric{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;}
+.metric{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(20,25,35,.05);position:relative;overflow:hidden;transition:box-shadow .18s;}
+.metric:hover{box-shadow:0 6px 16px rgba(20,25,35,.07);}
+.metric::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--orange),#5B85C4);opacity:.7;}
 .metric .lbl{font-size:12px;color:var(--metal);margin-bottom:6px;}
 .metric .val{font-size:21px;font-weight:500;font-family:'Roboto Slab',serif;}
 .metric .subv{font-size:11px;color:var(--green);margin-top:4px;}
@@ -186,14 +199,13 @@ tr:last-child td{border-bottom:none;}
 tbody tr:hover, table tr:hover{background:var(--paper);}
 .slot-tile{transition:transform .1s;}
 .slot-tile.free:hover{transform:scale(1.05);cursor:pointer;}
-.card{transition:border-color .15s;}
-.card:hover{border-color:var(--line-strong);}
 .badge{font-size:11px;padding:4px 10px;border-radius:20px;font-weight:500;white-space:nowrap;display:inline-block;}
 .badge.ok{background:#E6F0E7;color:var(--green);}
 .badge.pending{background:#FCEEDA;color:#A9691C;}
 .badge.flag{background:#FADEDA;color:var(--orange-dark);}
 
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin-bottom:12px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:12px;box-shadow:0 1px 3px rgba(20,25,35,.05);transition:box-shadow .18s,border-color .18s,transform .18s;}
+.card:hover{border-color:var(--line-strong);box-shadow:0 8px 20px rgba(20,25,35,.08);transform:translateY(-1px);}
 .card-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 .card-row h3{font-size:15px;}
 .card .meta{font-size:12.5px;color:var(--metal);margin-top:3px;}
@@ -216,12 +228,12 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .empty-state p{font-size:13.5px;color:var(--metal);margin:0 0 18px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;}
 
 /* SEARCH ENGINE */
-.search-panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px 6px;}
+.search-panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px 6px;box-shadow:0 2px 8px rgba(20,25,35,.05);}
 .search-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
 .opt-chip{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--metal-dark);border:1px solid var(--line-strong);border-radius:20px;padding:6px 12px;cursor:pointer;background:#fff;}
 .opt-chip input{width:auto;}
-.result-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:border-color .12s;}
-.result-card:hover{border-color:var(--line-strong);}
+.result-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:border-color .15s,box-shadow .15s,transform .15s;box-shadow:0 1px 3px rgba(20,25,35,.05);}
+.result-card:hover{border-color:var(--line-strong);box-shadow:0 8px 20px rgba(20,25,35,.08);transform:translateY(-1px);}
 .result-main{display:flex;gap:14px;align-items:flex-start;flex:1;}
 .result-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#DCE3EE,#C9D3E4);background-size:cover;background-position:center;flex-shrink:0;}
 .view-toggle{display:flex;border:1px solid var(--line-strong);border-radius:8px;padding:3px;}
@@ -235,7 +247,7 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .msg-time{font-size:10.5px;color:var(--metal);margin-top:2px;}
 
 /* INBOX (messagerie plein écran) */
-.inbox{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 170px);min-height:480px;margin:-28px -32px;border-top:1px solid var(--line);}
+.inbox{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 170px);min-height:480px;margin:-28px -32px;border-top:1px solid var(--line);box-shadow:inset 0 1px 0 rgba(0,0,0,.02);}
 .inbox-list{border-right:1px solid var(--line);overflow-y:auto;background:#fff;}
 .inbox-conv{padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;border-left:3px solid transparent;}
 .inbox-conv:hover{background:var(--paper);}
@@ -731,6 +743,16 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   </div>
 </div>
 
+<!-- CONFIRM / ALERT MODAL (remplace confirm() et alert() natifs) -->
+<div class="overlay" id="confirm-overlay">
+  <div class="modal confirm-modal">
+    <div class="confirm-icon" id="confirm-icon"></div>
+    <h2 id="confirm-title" style="font-size:17px;margin-bottom:8px;text-align:center;"></h2>
+    <p id="confirm-message" style="font-size:13.5px;color:var(--metal-dark);text-align:center;line-height:1.55;margin:0 0 22px;"></p>
+    <div id="confirm-actions" style="display:flex;gap:10px;"></div>
+  </div>
+</div>
+
 <!-- AVIS MODAL -->
 <div class="overlay" id="review-overlay">
   <div class="modal" style="max-width:420px;">
@@ -897,10 +919,10 @@ function checkPasswordStrength(input){
 
 async function requestPasswordReset(){
   const email = document.getElementById('login-email').value.trim();
-  if(!email){ alert('Indique d\'abord ton email dans le champ ci-dessus, puis clique à nouveau sur "Mot de passe oublié ?".'); return; }
+  if(!email){ await customAlert('Indique d\'abord ton email dans le champ ci-dessus, puis clique à nouveau sur "Mot de passe oublié ?".', { title:'Email manquant' }); return; }
   const { error } = await sb.auth.resetPasswordForEmail(email);
-  if(error){ alert(translateAuthError(error.message)); return; }
-  alert('Un email de réinitialisation a été envoyé à ' + email + ' s\'il correspond à un compte existant.');
+  if(error){ await customAlert(translateAuthError(error.message), { type:'error' }); return; }
+  await customAlert('Un email de réinitialisation a été envoyé à ' + email + ' s\'il correspond à un compte existant.', { type:'success', title:'Email envoyé' });
 }
 
 function pickRole(role){
@@ -954,7 +976,7 @@ async function submitSignup(e){
   });
 
   submitBtn.disabled = false; submitBtn.textContent = 'Créer mon compte';
-  if(error){ alert(translateAuthError(error.message)); return false; }
+  if(error){ await customAlert(translateAuthError(error.message), { type:'error' }); return false; }
 
   // Si la confirmation email est désactivée côté Supabase, la session est
   // immédiatement disponible ; sinon on invite à confirmer par email.
@@ -962,7 +984,7 @@ async function submitSignup(e){
     window.justSignedUp = true;
     await afterAuth();
   } else {
-    alert('Compte créé. Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.');
+    await customAlert('Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.', { title:'Compte créé', type:'success' });
     switchAuthTab('login');
   }
   return false;
@@ -980,7 +1002,7 @@ async function submitLogin(e){
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
   submitBtn.disabled = false; submitBtn.textContent = 'Se connecter';
-  if(error){ alert(translateAuthError(error.message)); return false; }
+  if(error){ await customAlert(translateAuthError(error.message), { type:'error' }); return false; }
   await afterAuth();
   return false;
 }
@@ -1265,11 +1287,11 @@ function renderResultsMap(list){
   }
 }
 
-function toggleCompareId(id, checked, checkboxEl){
+async function toggleCompareId(id, checked, checkboxEl){
   if(checked){
     if(compareIds.length >= 3){
       if(checkboxEl) checkboxEl.checked = false;
-      alert('Tu peux comparer 3 garages maximum à la fois. Retire-en un pour en ajouter un autre.');
+      await customAlert('Retire-en un pour en ajouter un autre.', { title:'3 garages maximum' });
       return;
     }
     if(!compareIds.includes(id)) compareIds.push(id);
@@ -1348,19 +1370,21 @@ async function loadOwnerGarages(){
 }
 
 async function deleteGarageSlot(slotId, garageId){
-  if(!confirm('Retirer cette place ? Elle ne sera plus proposée aux clients.')) return;
+  const ok = await customConfirm('Elle ne sera plus proposée aux clients.', { title:'Retirer cette place ?', danger:true, confirmText:'Retirer', cancelText:'Garder' });
+  if(!ok) return;
   const { error } = await sb.from('slots').delete().eq('id', slotId);
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   loadOwnerGarages();
 }
 
 async function deleteGarage(garageId, bookedCount){
-  const warning = Number(bookedCount) > 0
-    ? 'Ce garage a '+bookedCount+' place(s) actuellement réservée(s). Le supprimer annulera ces réservations. Continuer ?'
-    : 'Supprimer ce garage définitivement ? Cette action est irréversible.';
-  if(!confirm(warning)) return;
+  const message = Number(bookedCount) > 0
+    ? 'Ce garage a '+bookedCount+' place(s) actuellement réservée(s). Le supprimer annulera ces réservations. Cette action est irréversible.'
+    : 'Cette action est irréversible.';
+  const ok = await customConfirm(message, { title:'Supprimer ce garage ?', danger:true, confirmText:'Supprimer', cancelText:'Annuler' });
+  if(!ok) return;
   const { error } = await sb.from('garages').delete().eq('id', garageId);
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   showToast('Garage supprimé.');
   loadOwnerGarages();
 }
@@ -1539,7 +1563,7 @@ async function uploadInspection(kind){
   const { data: { user } } = await sb.auth.getUser();
   const path = activeInspectionBooking + '/' + kind + '-' + Date.now() + '-' + file.name;
   const { error: upErr } = await sb.storage.from('inspection-photos').upload(path, file);
-  if(upErr){ alert('Erreur d\'upload : ' + upErr.message); return; }
+  if(upErr){ await customAlert(upErr.message, { title:'Erreur d\'upload', type:'error' }); return; }
   await sb.from('inspection_photos').insert({
     booking_id: activeInspectionBooking, kind, photo_url: path, uploaded_by: user.id
   });
@@ -1574,9 +1598,9 @@ async function uploadIdentityDocument(){
   const { data: { user } } = await sb.auth.getUser();
   const path = user.id + '/' + Date.now() + '-' + file.name;
   const { error: upErr } = await sb.storage.from('identity-documents').upload(path, file);
-  if(upErr){ alert('Erreur d\'upload : ' + upErr.message); return; }
+  if(upErr){ await customAlert(upErr.message, { title:'Erreur d\'upload', type:'error' }); return; }
   const { error } = await sb.from('identity_documents').insert({ user_id:user.id, document_url:path });
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   document.getElementById('identity-file').value = '';
   await openIdentityModal();
 }
@@ -1624,9 +1648,10 @@ async function loadConversations(scope){
 }
 
 async function cancelBooking(bookingId){
-  if(!confirm('Annuler cette demande de réservation ? Cette action est définitive.')) return;
+  const ok = await customConfirm('Cette action est définitive.', { title:'Annuler cette demande ?', danger:true, confirmText:'Annuler la demande', cancelText:'Revenir' });
+  if(!ok) return;
   const { error } = await sb.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   showToast('Ta demande a été annulée.');
   loadClientBookings();
 }
@@ -1907,7 +1932,7 @@ async function sendMessage(scope){
   if(!content || !activeBookingId) return;
   const { data: { user } } = await sb.auth.getUser();
   const { error } = await sb.from('messages').insert({ booking_id:activeBookingId, sender_id:user.id, content });
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   input.value = '';
   await loadThreadMessages(scope, activeBookingId);
   loadConversations(scope); // rafraîchit l'aperçu du dernier message dans la liste
@@ -1977,7 +2002,7 @@ async function loadAdminListings(){
 
 async function setGarageStatus(garageId, status){
   const { error } = await sb.from('garages').update({ status }).eq('id', garageId);
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   loadAdminListings();
 }
 
@@ -2039,8 +2064,78 @@ async function viewIdentityDoc(docId){
 
 async function reviewIdentity(docId, status){
   const { error } = await sb.rpc('admin_review_identity', { doc_id:docId, new_status:status });
-  if(error){ alert('Erreur : ' + error.message); return; }
+  if(error){ await customAlert(error.message, { type:'error' }); return; }
   loadAdminVerifications();
+}
+
+/* CONFIRM / ALERT PERSONNALISES (remplace confirm() et alert() natifs) */
+const ICONS = {
+  danger: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4M12 17h.01"/><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>',
+  info: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 16v-5M12 8h.01"/></svg>',
+  success: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg>',
+  error: '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>'
+};
+
+function customConfirm(message, opts){
+  opts = opts || {};
+  const title = opts.title || 'Confirmer';
+  const confirmText = opts.confirmText || 'Confirmer';
+  const cancelText = opts.cancelText || 'Annuler';
+  const tone = opts.danger ? 'danger' : 'info';
+
+  document.getElementById('confirm-icon').className = 'confirm-icon ' + tone;
+  document.getElementById('confirm-icon').innerHTML = ICONS[tone];
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+
+  const actions = document.getElementById('confirm-actions');
+  actions.innerHTML = '';
+  const cancelBtn = document.createElement('button');
+  cancelBtn.className = 'btn ghost block';
+  cancelBtn.textContent = cancelText;
+  const okBtn = document.createElement('button');
+  okBtn.className = opts.danger ? 'btn primary block confirm-danger-btn' : 'btn primary block';
+  okBtn.textContent = confirmText;
+  actions.appendChild(cancelBtn);
+  actions.appendChild(okBtn);
+
+  document.getElementById('confirm-overlay').classList.add('open');
+
+  return new Promise(resolve => {
+    const cleanup = (result) => {
+      document.getElementById('confirm-overlay').classList.remove('open');
+      resolve(result);
+    };
+    cancelBtn.onclick = () => cleanup(false);
+    okBtn.onclick = () => cleanup(true);
+  });
+}
+
+function customAlert(message, opts){
+  opts = opts || {};
+  const title = opts.title || (opts.type === 'error' ? 'Erreur' : 'Information');
+  const tone = opts.type || 'info';
+
+  document.getElementById('confirm-icon').className = 'confirm-icon ' + tone;
+  document.getElementById('confirm-icon').innerHTML = ICONS[tone];
+  document.getElementById('confirm-title').textContent = title;
+  document.getElementById('confirm-message').textContent = message;
+
+  const actions = document.getElementById('confirm-actions');
+  actions.innerHTML = '';
+  const okBtn = document.createElement('button');
+  okBtn.className = 'btn primary block';
+  okBtn.textContent = 'Compris';
+  actions.appendChild(okBtn);
+
+  document.getElementById('confirm-overlay').classList.add('open');
+
+  return new Promise(resolve => {
+    okBtn.onclick = () => {
+      document.getElementById('confirm-overlay').classList.remove('open');
+      resolve();
+    };
+  });
 }
 
 /* CARROUSEL D'AVIS (données réelles) */
