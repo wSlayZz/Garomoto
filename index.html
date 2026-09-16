@@ -67,6 +67,16 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .field-error{font-size:12px;color:var(--orange-dark);margin-top:4px;display:none;}
 .field.error input{border-color:var(--orange-dark);}
 .field.error .field-error{display:block;}
+.password-field{position:relative;display:flex;}
+.password-field input{padding-right:70px;}
+.password-toggle{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--metal);font-size:12px;cursor:pointer;padding:4px 8px;font-family:inherit;}
+.password-toggle:hover{color:var(--ink);}
+.password-hint{font-size:11.5px;color:var(--metal);margin-top:5px;}
+.password-hint.valid{color:var(--green);}
+.forgot-link{font-size:12.5px;color:var(--metal-dark);text-align:right;cursor:pointer;margin:-6px 0 14px;}
+.forgot-link:hover{color:var(--orange-dark);text-decoration:underline;}
+.welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:14px 22px;border-radius:8px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .3s,transform .3s;z-index:200;max-width:90vw;text-align:center;}
+.welcome-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .modal-switch{font-size:13px;text-align:center;margin-top:16px;color:var(--metal);}
 .modal-switch b{color:var(--ink);cursor:pointer;}
 
@@ -157,6 +167,7 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .card-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
 .card-row h3{font-size:15px;}
 .card .meta{font-size:12.5px;color:var(--metal);margin-top:3px;}
+.conv-preview{font-size:13px;color:var(--metal-dark);margin:8px 0 0;}
 
 .slots-editor{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 6px;}
 .slot-tile{width:48px;height:48px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:500;font-family:'Roboto Slab',serif;font-size:14px;border:1px solid var(--line);}
@@ -342,6 +353,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
     <div class="sidebar">
       <div class="side-item active" data-tab="client-search" onclick="setSideTab(this,'client')">Trouver une place</div>
       <div class="side-item" data-tab="client-bookings" onclick="setSideTab(this,'client'); loadClientBookings();">Mes réservations</div>
+      <div class="side-item" data-tab="client-messages" onclick="setSideTab(this,'client'); loadConversations('client');">Messages</div>
     </div>
     <div class="main">
 
@@ -513,6 +525,12 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         </div>
         <div class="notice">Une notification te sera envoyée automatiquement 5 jours avant chaque date de retrait.</div>
       </div>
+
+      <div id="client-messages" class="tabpanel">
+        <h1>Messages</h1>
+        <p class="sub">Toutes tes conversations, réservation par réservation.</p>
+        <div id="client-conversations-list"><p class="sub">Chargement...</p></div>
+      </div>
     </div>
   </div>
 </div>
@@ -525,6 +543,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       <div class="side-item active" data-tab="owner-garages" onclick="setSideTab(this,'owner')">Mes garages</div>
       <div class="side-item" data-tab="owner-bookings" onclick="setSideTab(this,'owner'); loadOwnerBookings();">Réservations</div>
       <div class="side-item" data-tab="owner-revenue" onclick="setSideTab(this,'owner'); loadOwnerRevenue();">Revenus</div>
+      <div class="side-item" data-tab="owner-messages" onclick="setSideTab(this,'owner'); loadConversations('owner');">Messages</div>
     </div>
     <div class="main">
       <div id="owner-garages" class="tabpanel active">
@@ -571,6 +590,12 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
           <div class="metric"><div class="lbl">Note moyenne</div><div class="val">-</div></div>
         </div>
         <div id="owner-revenue-table"><p class="sub">Chargement...</p></div>
+      </div>
+
+      <div id="owner-messages" class="tabpanel">
+        <h1>Messages</h1>
+        <p class="sub">Toutes les conversations avec tes clients, en un coup d'œil.</p>
+        <div id="owner-conversations-list"><p class="sub">Chargement...</p></div>
       </div>
     </div>
   </div>
@@ -701,6 +726,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <div class="role-opt" id="role-client" onclick="pickRole('client')">Je cherche une place</div>
         <div class="role-opt" id="role-owner" onclick="pickRole('owner')">Je propose ma place</div>
       </div>
+      <p class="field-error" id="role-pick-error" style="display:none;margin:-8px 0 14px;">Choisis un profil pour continuer.</p>
       <form onsubmit="return submitSignup(event)">
         <div class="field" data-req="true">
           <label>Prénom</label>
@@ -714,7 +740,11 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         </div>
         <div class="field" data-req="true">
           <label>Mot de passe</label>
-          <input type="password" placeholder="8 caractères minimum">
+          <div class="password-field">
+            <input type="password" placeholder="8 caractères minimum" id="signup-password" oninput="checkPasswordStrength(this)">
+            <button type="button" class="password-toggle" onclick="togglePassword('signup-password', this)">Afficher</button>
+          </div>
+          <div class="password-hint" id="signup-password-hint">8 caractères minimum</div>
           <div class="field-error">Choisis un mot de passe.</div>
         </div>
         <button type="submit" class="btn primary block">Créer mon compte</button>
@@ -728,14 +758,18 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       <form onsubmit="return submitLogin(event)">
         <div class="field" data-req="true">
           <label>Email</label>
-          <input type="email" placeholder="prenom@email.com">
+          <input type="email" placeholder="prenom@email.com" id="login-email">
           <div class="field-error">Indique une adresse email valide.</div>
         </div>
         <div class="field" data-req="true">
           <label>Mot de passe</label>
-          <input type="password" placeholder="Ton mot de passe">
+          <div class="password-field">
+            <input type="password" placeholder="Ton mot de passe" id="login-password">
+            <button type="button" class="password-toggle" onclick="togglePassword('login-password', this)">Afficher</button>
+          </div>
           <div class="field-error">Indique ton mot de passe.</div>
         </div>
+        <p class="forgot-link" onclick="requestPasswordReset()">Mot de passe oublié ?</p>
         <button type="submit" class="btn primary block">Se connecter</button>
       </form>
       <div class="modal-switch">Pas encore de compte ? <b onclick="switchAuthTab('signup')">En créer un</b></div>
@@ -762,10 +796,33 @@ function switchAuthTab(tab){
   document.getElementById('pane-login').style.display = tab==='login' ? 'block':'none';
   document.getElementById('pane-signup').style.display = tab==='signup' ? 'block':'none';
 }
+function togglePassword(inputId, btn){
+  const input = document.getElementById(inputId);
+  const isHidden = input.type === 'password';
+  input.type = isHidden ? 'text' : 'password';
+  btn.textContent = isHidden ? 'Masquer' : 'Afficher';
+}
+
+function checkPasswordStrength(input){
+  const hint = document.getElementById('signup-password-hint');
+  const ok = input.value.length >= 6;
+  hint.textContent = ok ? 'Longueur suffisante' : (6 - input.value.length) + ' caractère(s) restant(s)';
+  hint.classList.toggle('valid', ok);
+}
+
+async function requestPasswordReset(){
+  const email = document.getElementById('login-email').value.trim();
+  if(!email){ alert('Indique d\'abord ton email dans le champ ci-dessus, puis clique à nouveau sur "Mot de passe oublié ?".'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if(error){ alert(translateAuthError(error.message)); return; }
+  alert('Un email de réinitialisation a été envoyé à ' + email + ' s\'il correspond à un compte existant.');
+}
+
 function pickRole(role){
   selectedRole = role;
   document.getElementById('role-client').classList.toggle('selected', role==='client');
   document.getElementById('role-owner').classList.toggle('selected', role==='owner');
+  document.getElementById('role-pick-error').style.display = 'none';
 }
 
 function validate(form){
@@ -778,10 +835,27 @@ function validate(form){
   return valid;
 }
 
+function translateAuthError(message){
+  const map = {
+    'Invalid login credentials': 'Email ou mot de passe incorrect.',
+    'User already registered': 'Un compte existe déjà avec cet email - connecte-toi plutôt.',
+    'Email not confirmed': 'Cette adresse email n\'a pas encore été confirmée.',
+    'Password should be at least 6 characters': 'Le mot de passe doit contenir au moins 6 caractères.',
+    'Unable to validate email address: invalid format': 'Cette adresse email n\'est pas valide.',
+    'For security purposes, you can only request this after': 'Merci de patienter un instant avant de réessayer.'
+  };
+  for(const key in map){ if(message && message.includes(key)) return map[key]; }
+  return message || 'Une erreur est survenue, réessaie dans un instant.';
+}
+
 async function submitSignup(e){
   e.preventDefault();
   if(!validate(e.target)) return false;
-  if(!selectedRole){ pickRole('client'); }
+  if(!selectedRole){
+    document.getElementById('role-pick-error').style.display = 'block';
+    return false;
+  }
+  document.getElementById('role-pick-error').style.display = 'none';
   const inputs = e.target.querySelectorAll('input');
   const fullName = inputs[0].value.trim();
   const email = inputs[1].value.trim();
@@ -791,15 +865,16 @@ async function submitSignup(e){
 
   const { data, error } = await sb.auth.signUp({
     email, password,
-    options: { data: { full_name: fullName, role: selectedRole || 'client' } }
+    options: { data: { full_name: fullName, role: selectedRole } }
   });
 
   submitBtn.disabled = false; submitBtn.textContent = 'Créer mon compte';
-  if(error){ alert('Inscription impossible : ' + error.message); return false; }
+  if(error){ alert(translateAuthError(error.message)); return false; }
 
   // Si la confirmation email est désactivée côté Supabase, la session est
   // immédiatement disponible ; sinon on invite à confirmer par email.
   if(data.session){
+    window.justSignedUp = true;
     await afterAuth();
   } else {
     alert('Compte créé. Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.');
@@ -820,7 +895,7 @@ async function submitLogin(e){
   const { data, error } = await sb.auth.signInWithPassword({ email, password });
 
   submitBtn.disabled = false; submitBtn.textContent = 'Se connecter';
-  if(error){ alert('Connexion impossible : ' + error.message); return false; }
+  if(error){ alert(translateAuthError(error.message)); return false; }
   await afterAuth();
   return false;
 }
@@ -864,6 +939,22 @@ function goDashboard(){
   if(role === 'client') fetchGarages();
   if(role === 'owner') loadOwnerGarages();
   if(role === 'admin') loadAdminOverview();
+  if(window.justSignedUp){
+    window.justSignedUp = false;
+    showWelcomeToast(role);
+  }
+}
+
+function showWelcomeToast(role){
+  const msg = role === 'owner'
+    ? 'Bienvenue sur GaroMoto ! Ajoute ton premier garage pour commencer à recevoir des demandes.'
+    : 'Bienvenue sur GaroMoto ! Trouve une place qui te convient ci-dessous.';
+  const toast = document.createElement('div');
+  toast.className = 'welcome-toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 20);
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(()=>toast.remove(), 300); }, 4500);
 }
 async function logout(){
   await sb.auth.signOut();
@@ -1335,6 +1426,45 @@ async function uploadIdentityDocument(){
   if(error){ alert('Erreur : ' + error.message); return; }
   document.getElementById('identity-file').value = '';
   await openIdentityModal();
+}
+
+/* LISTE DES CONVERSATIONS (accès rapide, sans passer par une réservation) */
+async function loadConversations(scope){
+  const container = document.getElementById(scope+'-conversations-list');
+  container.innerHTML = '<p class="sub">Chargement...</p>';
+  const { data: { user } } = await sb.auth.getUser();
+
+  let bookingsQuery = sb.from('bookings').select('id, moto_model, status, client_id, slots(label, garages(name, owner_id))');
+  if(scope === 'client') bookingsQuery = bookingsQuery.eq('client_id', user.id);
+  const { data: bookings, error } = await bookingsQuery;
+
+  if(error){ container.innerHTML = '<p class="sub">Impossible de charger les conversations.</p>'; return; }
+
+  const relevant = scope === 'owner'
+    ? (bookings||[]).filter(b => b.slots && b.slots.garages && b.slots.garages.owner_id === user.id)
+    : (bookings||[]);
+
+  if(!relevant.length){
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 1 1 8.5-8.5z"/></svg></div><h3>Aucune conversation pour le moment</h3><p>Les messages liés à tes réservations apparaîtront ici.</p></div>';
+    return;
+  }
+
+  // Dernier message par réservation
+  const bookingIds = relevant.map(b=>b.id);
+  const { data: allMessages } = await sb.from('messages').select('booking_id, content, sender_id, created_at').order('created_at', { ascending:false });
+  const lastByBooking = {};
+  (allMessages||[]).forEach(m => { if(bookingIds.includes(m.booking_id) && !lastByBooking[m.booking_id]) lastByBooking[m.booking_id] = m; });
+
+  container.innerHTML = relevant.map(b => {
+    const garageName = b.slots && b.slots.garages ? b.slots.garages.name : 'Garage';
+    const slotLabel = b.slots ? b.slots.label : '-';
+    const last = lastByBooking[b.id];
+    const preview = last ? (last.content.length > 60 ? last.content.slice(0,60)+'…' : last.content) : 'Aucun message pour le moment';
+    return '<div class="card" style="cursor:pointer;" onclick="openMessages(\''+b.id+'\')">'
+      + '<div class="card-row"><div><h3>'+garageName+' - place n°'+slotLabel+'</h3>'
+      + '<div class="meta">'+b.moto_model+'</div></div></div>'
+      + '<p class="conv-preview">'+preview+'</p></div>';
+  }).join('');
 }
 
 /* MENTIONS LEGALES */
