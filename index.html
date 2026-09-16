@@ -240,27 +240,13 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       </div>
       <div class="hero-visual">
         <div class="reviews-card">
-          <p class="reviews-title" id="review-source">Avis vérifiés</p>
+          <p class="reviews-title">Avis vérifiés</p>
           <div class="reviews-track" id="reviews-track">
             <div class="review-slide active">
-              <div class="review-stars">★★★★★</div>
-              <p class="review-text">"Dépôt et récupération hyper simples, la moto était parfaitement au sec tout l'hiver."</p>
-              <p class="review-author">T. Lambert - Garage de Julien, Vienne</p>
-            </div>
-            <div class="review-slide">
-              <div class="review-stars">★★★★★</div>
-              <p class="review-text">"Propriétaire réactif, état des lieux clair à l'arrivée et au départ. Aucune mauvaise surprise."</p>
-              <p class="review-author">C. Nguyen - Box sécurisé Sud-Vienne</p>
-            </div>
-            <div class="review-slide">
-              <div class="review-stars">★★★★☆</div>
-              <p class="review-text">"Très bon rapport qualité-prix, juste un peu loin de chez moi mais ça valait le coup."</p>
-              <p class="review-author">S. Morel - Hangar de Mathieu, Chonas</p>
+              <p class="review-text">Les avis de nos utilisateurs s'afficheront ici dès les premières réservations confirmées.</p>
             </div>
           </div>
-          <div class="reviews-dots" id="reviews-dots">
-            <span class="rdot active"></span><span class="rdot"></span><span class="rdot"></span>
-          </div>
+          <div class="reviews-dots" id="reviews-dots"></div>
         </div>
       </div>
     </div>
@@ -317,7 +303,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="shell">
     <div class="sidebar">
       <div class="side-item active" data-tab="client-search" onclick="setSideTab(this,'client')">Trouver une place</div>
-      <div class="side-item" data-tab="client-bookings" onclick="setSideTab(this,'client')">Mes réservations</div>
+      <div class="side-item" data-tab="client-bookings" onclick="setSideTab(this,'client'); loadClientBookings();">Mes réservations</div>
     </div>
     <div class="main">
 
@@ -478,14 +464,9 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <h1>Mes réservations</h1>
         <p class="sub">Suivi de tes demandes et places confirmées.</p>
         <div id="bookings-list">
-          <div class="card">
-            <div class="card-row">
-              <div><h3>Garage de Julien - place n°2</h3><div class="meta">03/11/2026 → 15/03/2027 · Yamaha XJ6</div></div>
-              <span class="badge ok">Confirmée</span>
-            </div>
-          </div>
+          <p class="sub">Chargement...</p>
         </div>
-        <div class="notice">Rappel : ton retrait est prévu le 15/03/2027 - une notification te sera envoyée 5 jours avant.</div>
+        <div class="notice">Une notification te sera envoyée automatiquement 5 jours avant chaque date de retrait.</div>
       </div>
     </div>
   </div>
@@ -497,89 +478,50 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="shell">
     <div class="sidebar">
       <div class="side-item active" data-tab="owner-garages" onclick="setSideTab(this,'owner')">Mes garages</div>
-      <div class="side-item" data-tab="owner-bookings" onclick="setSideTab(this,'owner')">Réservations</div>
-      <div class="side-item" data-tab="owner-revenue" onclick="setSideTab(this,'owner')">Revenus</div>
+      <div class="side-item" data-tab="owner-bookings" onclick="setSideTab(this,'owner'); loadOwnerBookings();">Réservations</div>
+      <div class="side-item" data-tab="owner-revenue" onclick="setSideTab(this,'owner'); loadOwnerRevenue();">Revenus</div>
     </div>
     <div class="main">
       <div id="owner-garages" class="tabpanel active">
         <h1>Mes garages</h1>
         <p class="sub">Gère tes places disponibles et les options que tu proposes.</p>
+        <div id="owner-garages-list"><p class="sub">Chargement...</p></div>
 
-        <div class="card">
-          <div class="card-row">
-            <div><h3>Garage de Julien</h3><div class="meta">Vienne (38) - 8 places - 45 €/mois</div></div>
-            <button class="btn small ghost">Modifier le tarif</button>
+        <div class="card" id="add-garage-form" style="display:none;">
+          <h3 style="font-size:15px;margin-bottom:12px;">Ajouter un garage</h3>
+          <div class="search-row">
+            <div class="field" style="flex:1;margin-bottom:0;"><label>Nom</label><input type="text" id="ng-name" placeholder="Garage de la gare"></div>
+            <div class="field" style="flex:1;margin-bottom:0;"><label>Ville</label><input type="text" id="ng-city" placeholder="Vienne (38)"></div>
           </div>
-
-          <p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>
-          <div class="slots-editor">
-            <div class="slot-tile booked">1</div><div class="slot-tile free">2</div><div class="slot-tile free">3</div>
-            <div class="slot-tile booked">4</div><div class="slot-tile free">5</div><div class="slot-tile booked">6</div>
-            <div class="slot-tile booked">7</div><div class="slot-tile booked">8</div>
-            <button class="add-slot" onclick="addSlot(this)">+</button>
+          <div class="search-row">
+            <div class="field" style="flex:1;margin-bottom:0;"><label>Tarif mensuel (€)</label><input type="number" id="ng-price" placeholder="45"></div>
+            <div class="field" style="flex:1;margin-bottom:0;"><label>Nombre de places initiales</label><input type="number" id="ng-slots" placeholder="4"></div>
           </div>
-          <p class="meta" style="margin-bottom:16px;">5 places réservées sur 8 - clique sur + pour ouvrir une nouvelle place.</p>
-
-          <p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>
-          <div class="search-row" style="margin-bottom:0;">
-            <label class="opt-chip"><input type="checkbox" checked> Vidéosurveillance</label>
-            <label class="opt-chip"><input type="checkbox" checked> Préparation hivernage</label>
-            <label class="opt-chip"><input type="checkbox"> Assurance incluse</label>
-            <label class="opt-chip"><input type="checkbox"> Accès 24/7</label>
-            <label class="opt-chip"><input type="checkbox"> Transport dépôt/retrait</label>
+          <div style="display:flex;gap:8px;margin-top:6px;">
+            <button class="btn primary small" onclick="createGarage()">Créer le garage</button>
+            <button class="btn ghost small" onclick="document.getElementById('add-garage-form').style.display='none'">Annuler</button>
           </div>
+          <p class="sub" id="ng-error" style="display:none;color:var(--orange-dark);margin-top:8px;"></p>
         </div>
-
-        <div class="card">
-          <div class="card-row">
-            <div><h3>Box sécurisé Sud-Vienne</h3><div class="meta">Estrablin (38) - 4 places - 55 €/mois</div></div>
-            <button class="btn small ghost">Modifier le tarif</button>
-          </div>
-          <p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>
-          <div class="slots-editor">
-            <div class="slot-tile booked">1</div><div class="slot-tile booked">2</div><div class="slot-tile booked">3</div><div class="slot-tile free">4</div>
-            <button class="add-slot" onclick="addSlot(this)">+</button>
-          </div>
-          <p class="meta" style="margin-bottom:16px;">3 places réservées sur 4.</p>
-          <p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>
-          <div class="search-row" style="margin-bottom:0;">
-            <label class="opt-chip"><input type="checkbox" checked> Assurance incluse</label>
-            <label class="opt-chip"><input type="checkbox" checked> Vidéosurveillance</label>
-            <label class="opt-chip"><input type="checkbox" checked> Accès 24/7</label>
-            <label class="opt-chip"><input type="checkbox"> Préparation hivernage</label>
-            <label class="opt-chip"><input type="checkbox"> Transport dépôt/retrait</label>
-          </div>
-        </div>
-
-        <button class="btn primary">Ajouter un garage</button>
+        <button class="btn primary" onclick="document.getElementById('add-garage-form').style.display='block'">Ajouter un garage</button>
       </div>
 
       <div id="owner-bookings" class="tabpanel">
         <h1>Réservations</h1>
         <p class="sub">Suivi des demandes et séjours en cours sur tes garages.</p>
-        <table>
-          <tr><th>Client</th><th>Garage</th><th>Place</th><th>Moto</th><th>Période</th><th>Statut</th><th></th></tr>
-          <tr><td>T. Lambert</td><td>Garage de Julien</td><td>n°2</td><td>Yamaha XJ6</td><td>03/11 → 15/03</td><td><span class="badge ok">Confirmée</span></td><td><button class="btn small ghost">État des lieux</button></td></tr>
-          <tr><td>C. Nguyen</td><td>Garage de Julien</td><td>n°1</td><td>Honda CB500</td><td>01/11 → 28/02</td><td><span class="badge ok">En cours</span></td><td><button class="btn small ghost">État des lieux</button></td></tr>
-          <tr><td>S. Morel</td><td>Box sécurisé Sud-Vienne</td><td>n°4</td><td>Kawasaki Z650</td><td>10/11 → 20/03</td><td><span class="badge pending">Dépôt à venir</span></td><td><button class="btn small primary">Confirmer</button></td></tr>
-        </table>
+        <div id="owner-bookings-list"><p class="sub">Chargement...</p></div>
       </div>
 
       <div id="owner-revenue" class="tabpanel">
         <h1>Revenus</h1>
         <p class="sub">Vue d'ensemble de tes gains sur l'ensemble de tes garages.</p>
-        <div class="metric-grid">
-          <div class="metric"><div class="lbl">Revenu réalisé</div><div class="val">890 €</div><div class="subv">depuis le 1er nov.</div></div>
-          <div class="metric"><div class="lbl">Prévisionnel saison</div><div class="val">1 640 €</div><div class="subv">estimation fin de saison</div></div>
-          <div class="metric"><div class="lbl">Occupation</div><div class="val">67%</div><div class="subv">12 places / 18</div></div>
-          <div class="metric"><div class="lbl">Note moyenne</div><div class="val">4.8 ★</div><div class="subv">12 avis</div></div>
+        <div class="metric-grid" id="owner-revenue-metrics">
+          <div class="metric"><div class="lbl">Revenu confirmé</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">En attente</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Occupation</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Note moyenne</div><div class="val">-</div></div>
         </div>
-        <table>
-          <tr><th>Mois</th><th>Réservations actives</th><th>Revenu brut</th><th>Commission GaroMoto (8%)</th><th>Net</th></tr>
-          <tr><td>Novembre</td><td>10</td><td>450 €</td><td>36 €</td><td>414 €</td></tr>
-          <tr><td>Décembre (prév.)</td><td>12</td><td>540 €</td><td>43 €</td><td>497 €</td></tr>
-          <tr><td>Janvier (prév.)</td><td>12</td><td>540 €</td><td>43 €</td><td>497 €</td></tr>
-        </table>
+        <div id="owner-revenue-table"><p class="sub">Chargement...</p></div>
       </div>
     </div>
   </div>
@@ -590,61 +532,41 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="shell">
     <div class="sidebar">
       <div class="side-item active" data-tab="admin-overview" onclick="setSideTab(this,'admin')">Vue d'ensemble</div>
-      <div class="side-item" data-tab="admin-users" onclick="setSideTab(this,'admin')">Utilisateurs</div>
-      <div class="side-item" data-tab="admin-listings" onclick="setSideTab(this,'admin')">Garages</div>
-      <div class="side-item" data-tab="admin-disputes" onclick="setSideTab(this,'admin')">Litiges</div>
+      <div class="side-item" data-tab="admin-users" onclick="setSideTab(this,'admin'); loadAdminUsers();">Comptes</div>
+      <div class="side-item" data-tab="admin-listings" onclick="setSideTab(this,'admin'); loadAdminListings();">Garages</div>
+      <div class="side-item" data-tab="admin-disputes" onclick="setSideTab(this,'admin'); loadAdminDisputes();">Litiges</div>
     </div>
     <div class="main">
       <div id="admin-overview" class="tabpanel active">
         <h1>Vue d'ensemble</h1>
-        <div class="metric-grid">
-          <div class="metric"><div class="lbl">Garages actifs</div><div class="val">18</div><div class="subv">+3 ce mois</div></div>
-          <div class="metric"><div class="lbl">Places réservées</div><div class="val">52 / 74</div><div class="subv">70% occupation</div></div>
-          <div class="metric"><div class="lbl">Volume réservé</div><div class="val">6 840 €</div><div class="subv">saison en cours</div></div>
-          <div class="metric"><div class="lbl">Commission (8%)</div><div class="val">547 €</div><div class="subv">revenu plateforme</div></div>
+        <p class="sub">Vue globale de la plateforme - aucune donnée personnelle des utilisateurs n'est affichée ici.</p>
+        <div class="metric-grid" id="admin-metrics">
+          <div class="metric"><div class="lbl">Garages actifs</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Réservations actives</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Volume confirmé</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Commission (8%)</div><div class="val">-</div></div>
         </div>
-        <div class="notice">3 propriétaires en attente de vérification d'identité.</div>
-        <table>
-          <tr><th>Événement</th><th>Utilisateur</th><th>Date</th><th>Statut</th></tr>
-          <tr><td>Nouvelle réservation - place n°2</td><td>T. Lambert</td><td>13 sept.</td><td><span class="badge ok">Confirmée</span></td></tr>
-          <tr><td>Inscription propriétaire</td><td>M. Roussel</td><td>12 sept.</td><td><span class="badge pending">À vérifier</span></td></tr>
-          <tr><td>Signalement état des lieux</td><td>J. Petit</td><td>10 sept.</td><td><span class="badge flag">Litige ouvert</span></td></tr>
-        </table>
+        <div id="admin-overview-table"><p class="sub">Chargement...</p></div>
       </div>
       <div id="admin-users" class="tabpanel">
-        <h1>Utilisateurs</h1>
-        <table>
-          <tr><th>Nom</th><th>Rôle</th><th>Identité</th><th>Note</th><th></th></tr>
-          <tr><td>Julien Faure</td><td>Propriétaire</td><td><span class="badge ok">Vérifiée</span></td><td>4.8 ★</td><td><button class="btn small ghost">Voir</button></td></tr>
-          <tr><td>M. Roussel</td><td>Propriétaire</td><td><span class="badge pending">En attente</span></td><td>-</td><td><button class="btn small primary">Vérifier</button></td></tr>
-          <tr><td>T. Lambert</td><td>Client</td><td><span class="badge ok">Vérifiée</span></td><td>5.0 ★</td><td><button class="btn small ghost">Voir</button></td></tr>
-        </table>
+        <h1>Comptes</h1>
+        <p class="sub">Répartition des comptes par rôle - sans accès aux identités individuelles.</p>
+        <div class="metric-grid" id="admin-users-metrics">
+          <div class="metric"><div class="lbl">Clients</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Propriétaires</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Admins</div><div class="val">-</div></div>
+          <div class="metric"><div class="lbl">Total</div><div class="val">-</div></div>
+        </div>
       </div>
       <div id="admin-listings" class="tabpanel">
         <h1>Garages</h1>
-        <table>
-          <tr><th>Garage</th><th>Propriétaire</th><th>Places</th><th>Statut</th><th></th></tr>
-          <tr><td>Garage de Julien</td><td>Julien Faure</td><td>8</td><td><span class="badge ok">Publié</span></td><td><button class="btn small ghost">Gérer</button></td></tr>
-          <tr><td>Garage résidentiel</td><td>M. Roussel</td><td>2</td><td><span class="badge pending">En attente</span></td><td><button class="btn small primary">Approuver</button></td></tr>
-        </table>
+        <p class="sub">Tous les garages de la plateforme, publiés ou en attente.</p>
+        <div id="admin-listings-table"><p class="sub">Chargement...</p></div>
       </div>
       <div id="admin-disputes" class="tabpanel">
         <h1>Litiges</h1>
-        <div class="card">
-          <div class="card-row">
-            <div><h3>État des lieux contesté - place n°6</h3><div class="meta">J. Petit vs Mathieu Delvaux - ouvert le 10/09/2026</div></div>
-            <span class="badge flag">Ouvert</span>
-          </div>
-          <div style="margin-top:10px;display:flex;gap:8px;">
-            <button class="btn small ghost">Comparer les photos</button>
-            <button class="btn small primary">Trancher</button>
-          </div>
-        </div>
-        <div class="empty-state">
-          <div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
-          <h3>Aucun autre litige en cours</h3>
-          <p>Les états des lieux contestés apparaîtront ici dès qu'un client ou un propriétaire en signale un.</p>
-        </div>
+        <p class="sub">Réservations signalées, identifiées par garage et place - jamais par identité client.</p>
+        <div id="admin-disputes-list"><p class="sub">Chargement...</p></div>
       </div>
     </div>
   </div>
@@ -701,10 +623,6 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
           <input type="password" placeholder="Ton mot de passe">
           <div class="field-error">Indique ton mot de passe.</div>
         </div>
-        <div class="role-pick">
-          <div class="role-opt" id="login-role-client" onclick="pickLoginRole('client')">Client</div>
-          <div class="role-opt" id="login-role-owner" onclick="pickLoginRole('owner')">Propriétaire</div>
-        </div>
         <button type="submit" class="btn primary block">Se connecter</button>
       </form>
       <div class="modal-switch">Pas encore de compte ? <b onclick="switchAuthTab('signup')">En créer un</b></div>
@@ -712,9 +630,12 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
+const SUPABASE_URL = 'https://qbsshcqemcefkqvsefsc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFic3NoY3FlbWNlZmtxdnNlZnNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk1Mjk3MTQsImV4cCI6MjEwNTEwNTcxNH0.Q6fjNrdm3ZwCEqkT-JL3cf1O7hHX-YB2Fr0k0uVfiW0';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 let selectedRole = null;
-let selectedLoginRole = null;
 
 function openAuth(tab, presetRole){
   document.getElementById('auth-overlay').classList.add('open');
@@ -733,11 +654,6 @@ function pickRole(role){
   document.getElementById('role-client').classList.toggle('selected', role==='client');
   document.getElementById('role-owner').classList.toggle('selected', role==='owner');
 }
-function pickLoginRole(role){
-  selectedLoginRole = role;
-  document.getElementById('login-role-client').classList.toggle('selected', role==='client');
-  document.getElementById('login-role-owner').classList.toggle('selected', role==='owner');
-}
 
 function validate(form){
   let valid = true;
@@ -749,23 +665,64 @@ function validate(form){
   return valid;
 }
 
-function submitSignup(e){
+async function submitSignup(e){
   e.preventDefault();
   if(!validate(e.target)) return false;
   if(!selectedRole){ pickRole('client'); }
-  const name = e.target.querySelector('input[type=text]').value.trim() || 'Toi';
-  loginAs(name, selectedRole || 'client');
-  return false;
-}
-function submitLogin(e){
-  e.preventDefault();
-  if(!validate(e.target)) return false;
-  const role = selectedLoginRole || 'client';
-  loginAs(role==='owner' ? 'Julien' : 'Axel', role);
+  const inputs = e.target.querySelectorAll('input');
+  const fullName = inputs[0].value.trim();
+  const email = inputs[1].value.trim();
+  const password = inputs[2].value;
+  const submitBtn = e.target.querySelector('button[type=submit]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Création...';
+
+  const { data, error } = await sb.auth.signUp({
+    email, password,
+    options: { data: { full_name: fullName, role: selectedRole || 'client' } }
+  });
+
+  submitBtn.disabled = false; submitBtn.textContent = 'Créer mon compte';
+  if(error){ alert('Inscription impossible : ' + error.message); return false; }
+
+  // Si la confirmation email est désactivée côté Supabase, la session est
+  // immédiatement disponible ; sinon on invite à confirmer par email.
+  if(data.session){
+    await afterAuth();
+  } else {
+    alert('Compte créé. Vérifie ta boîte mail pour confirmer ton adresse avant de te connecter.');
+    switchAuthTab('login');
+  }
   return false;
 }
 
-function loginAs(name, role){
+async function submitLogin(e){
+  e.preventDefault();
+  if(!validate(e.target)) return false;
+  const inputs = e.target.querySelectorAll('input');
+  const email = inputs[0].value.trim();
+  const password = inputs[1].value;
+  const submitBtn = e.target.querySelector('button[type=submit]');
+  submitBtn.disabled = true; submitBtn.textContent = 'Connexion...';
+
+  const { data, error } = await sb.auth.signInWithPassword({ email, password });
+
+  submitBtn.disabled = false; submitBtn.textContent = 'Se connecter';
+  if(error){ alert('Connexion impossible : ' + error.message); return false; }
+  await afterAuth();
+  return false;
+}
+
+async function afterAuth(){
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+  const { data: profile, error } = await sb.from('profiles').select('full_name, role').eq('id', user.id).single();
+  if(error || !profile){ console.error(error); return; }
+  applySession(profile.full_name || user.email, profile.role, user.id);
+  closeAuth();
+  goDashboard();
+}
+
+function applySession(name, role, userId){
   document.getElementById('nav-logged-out').style.display='none';
   document.getElementById('nav-logged-in').style.display='flex';
   document.getElementById('chip-name').textContent = name;
@@ -773,18 +730,12 @@ function loginAs(name, role){
   const roleLabels = {client:'Compte client', owner:'Compte propriétaire', admin:'Compte admin'};
   document.getElementById('dropdown-role').textContent = roleLabels[role] || 'Compte';
   window.currentRole = role;
-  try { localStorage.setItem('garomoto_session', JSON.stringify({name, role})); } catch(e){}
-  closeAuth();
-  goDashboard();
+  window.currentUserId = userId;
 }
 
-function tryAutoLogin(){
-  try {
-    const raw = localStorage.getItem('garomoto_session');
-    if(!raw) return;
-    const session = JSON.parse(raw);
-    if(session && session.name && session.role) loginAs(session.name, session.role);
-  } catch(e){}
+async function tryAutoLogin(){
+  const { data: { session } } = await sb.auth.getSession();
+  if(session && session.user) await afterAuth();
 }
 
 function goLanding(){
@@ -802,12 +753,15 @@ function goDashboard(){
   const role = window.currentRole || 'client';
   document.getElementById('view-'+role).classList.add('active');
   closeDropdown();
-  if(role === 'client') runSearch();
+  if(role === 'client') fetchGarages();
+  if(role === 'owner') loadOwnerGarages();
+  if(role === 'admin') loadAdminOverview();
 }
-function logout(){
+async function logout(){
+  await sb.auth.signOut();
   document.getElementById('nav-logged-out').style.display='flex';
   document.getElementById('nav-logged-in').style.display='none';
-  try { localStorage.removeItem('garomoto_session'); } catch(e){}
+  window.currentRole = null; window.currentUserId = null;
   goLanding();
 }
 document.addEventListener('DOMContentLoaded', tryAutoLogin);
@@ -825,36 +779,66 @@ function setSideTab(el, scope){
   container.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById(el.dataset.tab).classList.add('active');
 }
-function addSlot(btn){
-  const n = btn.parentElement.querySelectorAll('.slot-tile').length + 1;
-  const tile = document.createElement('div');
-  tile.className = 'slot-tile free';
-  tile.textContent = n;
-  btn.parentElement.insertBefore(tile, btn);
-}
 
-/* MOTEUR DE RECHERCHE CLIENT */
+/* MOTEUR DE RECHERCHE CLIENT (données réelles Supabase) */
 const OPTION_LABELS = {
   assurance: 'Assurance incluse', prepa: 'Préparation hivernage',
   video: 'Vidéosurveillance', acces24: 'Accès 24/7', transport: 'Transport dépôt/retrait'
 };
-const GARAGES = [
-  { id:'julien', name:'Garage de Julien', loc:'Vienne (38)', distance:2.4, rating:4.8, reviews:12, price:45,
-    options:['video','prepa'], freeSlots:['2','5','7','8'], bookedSlots:['1','4','6'] },
-  { id:'sudvienne', name:'Box sécurisé Sud-Vienne', loc:'Estrablin (38)', distance:6.1, rating:4.8, reviews:9, price:55,
-    options:['assurance','video','acces24'], freeSlots:['4'], bookedSlots:['1','2','3'] },
-  { id:'mathieu', name:'Hangar de Mathieu', loc:'Chonas (38)', distance:9.8, rating:4.6, reviews:15, price:70,
-    options:['prepa','transport','assurance'], freeSlots:['3','5','9','10'], bookedSlots:['1','2','4','6','7','8'] },
-];
+let GARAGES = [];
 let compareIds = [];
+let userCoords = { lat:45.5256, lng:4.8737 }; // Vienne (38) par défaut
+
+function haversine(lat1, lon1, lat2, lon2){
+  if(lat1==null||lon1==null||lat2==null||lon2==null) return 999;
+  const R = 6371, toRad = d => d*Math.PI/180;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+async function fetchGarages(){
+  const container = document.getElementById('results-list');
+  container.innerHTML = '<p class="sub">Chargement des places disponibles...</p>';
+  const { data, error } = await sb
+    .from('garages')
+    .select('id, name, city, latitude, longitude, price_per_month, garage_options(option_key), slots(id, label, bookings(status)), reviews(rating)')
+    .eq('status', 'published');
+
+  if(error){ console.error(error); container.innerHTML = '<p class="sub">Impossible de charger les garages pour le moment.</p>'; return; }
+
+  GARAGES = (data || []).map(g => {
+    const ratings = (g.reviews || []).map(r => r.rating);
+    const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length) : null;
+    const freeSlots = [], bookedSlots = [];
+    (g.slots || []).forEach(s => {
+      const isBooked = (s.bookings || []).some(b => b.status === 'confirmed' || b.status === 'pending');
+      (isBooked ? bookedSlots : freeSlots).push({ id:s.id, label:s.label });
+    });
+    return {
+      id: g.id, name: g.name, loc: g.city, price: g.price_per_month,
+      latitude: g.latitude, longitude: g.longitude,
+      distance: haversine(userCoords.lat, userCoords.lng, g.latitude, g.longitude),
+      rating: avgRating, reviewsCount: ratings.length,
+      options: (g.garage_options || []).map(o => o.option_key),
+      freeSlots, bookedSlots
+    };
+  });
+  runSearch();
+}
 
 function useMyLocation(){
   const input = document.getElementById('s-location');
   if(!navigator.geolocation){ input.value = 'Position indisponible'; return; }
   input.value = 'Localisation en cours...';
   navigator.geolocation.getCurrentPosition(
-    function(pos){ input.value = 'Ma position actuelle'; runSearch(); },
-    function(){ input.value = 'Vienne, 38200'; runSearch(); }
+    function(pos){
+      userCoords = { lat:pos.coords.latitude, lng:pos.coords.longitude };
+      input.value = 'Ma position actuelle';
+      GARAGES.forEach(g => g.distance = haversine(userCoords.lat, userCoords.lng, g.latitude, g.longitude));
+      runSearch();
+    },
+    function(){ input.value = 'Vienne, 38200'; }
   );
 }
 
@@ -863,30 +847,36 @@ function runSearch(){
   const budget = parseFloat(document.getElementById('s-budget').value);
   const sort = document.getElementById('s-sort').value;
   const activeOpts = [...document.querySelectorAll('.s-opt:checked')].map(c=>c.value);
+  const locText = document.getElementById('s-location').value.trim().toLowerCase().split(',')[0].trim();
 
   let list = GARAGES.filter(g => g.distance <= radius && g.price <= budget);
   if(activeOpts.length){
     list = list.filter(g => activeOpts.every(o => g.options.includes(o)));
   }
+  if(locText && !['ma position actuelle','localisation en cours...','position indisponible'].includes(locText)){
+    list = list.filter(g => g.loc.toLowerCase().includes(locText) || g.name.toLowerCase().includes(locText));
+  }
   if(sort === 'distance') list.sort((a,b)=>a.distance-b.distance);
   if(sort === 'price') list.sort((a,b)=>a.price-b.price);
-  if(sort === 'rating') list.sort((a,b)=>b.rating-a.rating);
+  if(sort === 'rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
 
   document.getElementById('results-count').textContent = list.length + (list.length>1 ? ' places trouvées' : ' place trouvée');
   const container = document.getElementById('results-list');
 
   if(!list.length){
-    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Aucune place ne correspond</h3><p>Essaie d\'élargir le rayon de recherche ou de retirer un filtre d\'options.</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Aucune place ne correspond</h3><p>Essaie d\'élargir le rayon de recherche, ou aucun garage n\'est encore publié dans ce secteur.</p></div>';
     return;
   }
 
   container.innerHTML = list.map(g => {
     const tags = g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('');
     const checked = compareIds.includes(g.id) ? 'checked' : '';
+    const ratingText = g.rating ? (g.rating.toFixed(1) + ' ★ (' + g.reviewsCount + ' avis)') : 'Pas encore d\'avis';
+    const distText = g.distance < 999 ? g.distance.toFixed(1).replace('.0','') + ' km' : 'distance inconnue';
     return '<div class="result-card">'
       + '<div class="result-main"><div class="result-thumb"></div>'
       + '<div class="result-info"><h3>'+g.name+'</h3>'
-      + '<div class="meta">'+g.loc+' - '+g.distance.toFixed(1).replace('.0','')+' km - '+g.rating+' ★ ('+g.reviews+' avis)</div>'
+      + '<div class="meta">'+g.loc+' - '+distText+' - '+ratingText+'</div>'
       + '<div class="result-tags">'+tags+'</div></div></div>'
       + '<div class="result-side">'
       + '<div class="result-price">'+g.price+' € <span>/mois</span></div>'
@@ -926,30 +916,269 @@ function backToSearch(){
   document.getElementById('client-search').classList.add('active');
 }
 
+/* ESPACE PROPRIETAIRE */
+async function loadOwnerGarages(){
+  const container = document.getElementById('owner-garages-list');
+  container.innerHTML = '<p class="sub">Chargement...</p>';
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+
+  const { data, error } = await sb
+    .from('garages')
+    .select('id, name, city, price_per_month, status, garage_options(option_key), slots(id, label, bookings(status))')
+    .eq('owner_id', user.id);
+
+  if(error){ console.error(error); container.innerHTML = '<p class="sub">Impossible de charger tes garages.</p>'; return; }
+
+  if(!data || !data.length){
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="10" rx="1.5"/><path d="M7 10V7a5 5 0 0 1 10 0v3"/></svg></div><h3>Aucun garage pour le moment</h3><p>Ajoute ton premier garage pour commencer à recevoir des réservations.</p></div>';
+    return;
+  }
+
+  container.innerHTML = data.map(g => {
+    const bookedCount = (g.slots||[]).filter(s => (s.bookings||[]).some(b=>b.status==='confirmed'||b.status==='pending')).length;
+    const slotsHtml = (g.slots||[]).map(s => {
+      const booked = (s.bookings||[]).some(b=>b.status==='confirmed'||b.status==='pending');
+      return '<div class="slot-tile '+(booked?'booked':'free')+'">'+s.label+'</div>';
+    }).join('');
+    const optKeys = (g.garage_options||[]).map(o=>o.option_key);
+    const optsHtml = Object.keys(OPTION_LABELS).map(k =>
+      '<label class="opt-chip"><input type="checkbox" '+(optKeys.includes(k)?'checked':'')+' onchange="toggleGarageOption(\''+g.id+'\',\''+k+'\',this.checked)"> '+OPTION_LABELS[k]+'</label>'
+    ).join('');
+    return '<div class="card">'
+      + '<div class="card-row"><div><h3>'+g.name+'</h3><div class="meta">'+g.city+' - '+(g.slots||[]).length+' places - '+g.price_per_month+' €/mois'
+      + (g.status==='pending' ? ' <span class="badge pending" style="margin-left:6px;">En attente de validation</span>' : '') + '</div></div></div>'
+      + '<p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>'
+      + '<div class="slots-editor" id="slots-'+g.id+'">'+slotsHtml+'<button class="add-slot" onclick="addGarageSlot(\''+g.id+'\')">+</button></div>'
+      + '<p class="meta" style="margin-bottom:16px;">'+bookedCount+' places réservées sur '+(g.slots||[]).length+'.</p>'
+      + '<p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>'
+      + '<div class="search-row" style="margin-bottom:0;">'+optsHtml+'</div>'
+      + '</div>';
+  }).join('');
+}
+
+async function createGarage(){
+  const name = document.getElementById('ng-name').value.trim();
+  const city = document.getElementById('ng-city').value.trim();
+  const price = parseFloat(document.getElementById('ng-price').value);
+  const slotCount = parseInt(document.getElementById('ng-slots').value) || 0;
+  const errEl = document.getElementById('ng-error');
+
+  if(!name || !city || !price || slotCount < 1){
+    errEl.textContent = 'Merci de remplir tous les champs (au moins 1 place).';
+    errEl.style.display = 'block';
+    return;
+  }
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+
+  const { data: garage, error } = await sb.from('garages')
+    .insert({ owner_id:user.id, name, city, price_per_month:price, status:'pending' })
+    .select().single();
+
+  if(error){ errEl.textContent = 'Erreur : ' + error.message; errEl.style.display='block'; return; }
+
+  const slotRows = Array.from({length:slotCount}, (_,i) => ({ garage_id:garage.id, label:String(i+1) }));
+  await sb.from('slots').insert(slotRows);
+
+  document.getElementById('add-garage-form').style.display = 'none';
+  document.getElementById('ng-name').value = '';
+  document.getElementById('ng-city').value = '';
+  document.getElementById('ng-price').value = '';
+  document.getElementById('ng-slots').value = '';
+  loadOwnerGarages();
+}
+
+async function addGarageSlot(garageId){
+  const container = document.getElementById('slots-'+garageId);
+  const n = container.querySelectorAll('.slot-tile').length + 1;
+  await sb.from('slots').insert({ garage_id:garageId, label:String(n) });
+  loadOwnerGarages();
+}
+
+async function toggleGarageOption(garageId, optionKey, checked){
+  if(checked){
+    await sb.from('garage_options').insert({ garage_id:garageId, option_key:optionKey });
+  } else {
+    await sb.from('garage_options').delete().eq('garage_id', garageId).eq('option_key', optionKey);
+  }
+}
+
+async function loadOwnerBookings(){
+  const container = document.getElementById('owner-bookings-list');
+  container.innerHTML = '<p class="sub">Chargement...</p>';
+  const { data, error } = await sb
+    .from('bookings')
+    .select('id, moto_model, date_in, date_out, status, slots(label, garages(name, owner_id))')
+    .order('created_at', { ascending:false });
+
+  if(error){ console.error(error); container.innerHTML = '<p class="sub">Impossible de charger les réservations.</p>'; return; }
+
+  const { data: { user } } = await sb.auth.getUser();
+  const mine = (data||[]).filter(b => b.slots && b.slots.garages && b.slots.garages.owner_id === user.id);
+
+  if(!mine.length){
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Aucune réservation pour le moment</h3><p>Les demandes de réservation sur tes garages apparaîtront ici.</p></div>';
+    return;
+  }
+
+  const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
+  const rows = mine.map(b => {
+    const badge = b.status==='confirmed' ? '<span class="badge ok">Confirmée</span>' : b.status==='disputed' ? '<span class="badge flag">Litige</span>' : '<span class="badge pending">En attente</span>';
+    const action = b.status==='pending' ? '<button class="btn small primary" onclick="setBookingStatus(\''+b.id+'\',\'confirmed\')">Confirmer</button>' : '<button class="btn small ghost">État des lieux</button>';
+    return '<tr><td>'+b.slots.garages.name+'</td><td>n°'+b.slots.label+'</td><td>'+b.moto_model+'</td><td>'+fmtDate(b.date_in)+' → '+fmtDate(b.date_out)+'</td><td>'+badge+'</td><td>'+action+'</td></tr>';
+  }).join('');
+  container.innerHTML = '<table><tr><th>Garage</th><th>Place</th><th>Moto</th><th>Période</th><th>Statut</th><th></th></tr>'+rows+'</table>';
+}
+
+async function setBookingStatus(bookingId, status){
+  await sb.from('bookings').update({ status }).eq('id', bookingId);
+  loadOwnerBookings();
+}
+
+async function loadOwnerRevenue(){
+  const { data: { user } } = await sb.auth.getUser();
+  const { data, error } = await sb
+    .from('bookings')
+    .select('total_price, status, slots(garages(owner_id))');
+  if(error){ console.error(error); return; }
+
+  const mine = (data||[]).filter(b => b.slots && b.slots.garages && b.slots.garages.owner_id === user.id);
+  const confirmed = mine.filter(b=>b.status==='confirmed').reduce((s,b)=>s+Number(b.total_price),0);
+  const pending = mine.filter(b=>b.status==='pending').reduce((s,b)=>s+Number(b.total_price),0);
+
+  const { data: reviewsData } = await sb.from('reviews').select('rating, garages(owner_id)');
+  const myReviews = (reviewsData||[]).filter(r=>r.garages && r.garages.owner_id===user.id).map(r=>r.rating);
+  const avgRating = myReviews.length ? (myReviews.reduce((a,b)=>a+b,0)/myReviews.length).toFixed(1) : '-';
+
+  const fmt = n => n.toLocaleString('fr-FR', {minimumFractionDigits:0}) + ' €';
+  document.getElementById('owner-revenue-metrics').innerHTML =
+    '<div class="metric"><div class="lbl">Revenu confirmé</div><div class="val">'+fmt(confirmed)+'</div></div>'
+    + '<div class="metric"><div class="lbl">En attente</div><div class="val">'+fmt(pending)+'</div></div>'
+    + '<div class="metric"><div class="lbl">Réservations</div><div class="val">'+mine.length+'</div></div>'
+    + '<div class="metric"><div class="lbl">Note moyenne</div><div class="val">'+(avgRating!=='-'?avgRating+' ★':'-')+'</div></div>';
+
+  document.getElementById('owner-revenue-table').innerHTML = mine.length
+    ? '<p class="sub">Détail par réservation disponible dans l\'onglet Réservations.</p>'
+    : '<p class="sub">Aucun revenu enregistré pour le moment.</p>';
+}
+
+/* ADMIN GOD MODE (aucune donnée personnelle) */
+async function loadAdminOverview(){
+  const { data, error } = await sb.rpc('get_admin_overview');
+  const tableEl = document.getElementById('admin-overview-table');
+  if(error){
+    tableEl.innerHTML = '<p class="sub">Accès refusé ou erreur : ' + error.message + '</p>';
+    return;
+  }
+  const rows = data || [];
+  const totalSlots = rows.reduce((s,r)=>s+Number(r.total_slots||0),0);
+  const activeBookings = rows.reduce((s,r)=>s+Number(r.active_bookings||0),0);
+  const grossRevenue = rows.reduce((s,r)=>s+Number(r.gross_revenue||0),0);
+  const commission = rows.reduce((s,r)=>s+Number(r.platform_commission||0),0);
+  const publishedCount = rows.filter(r=>r.status==='published').length;
+
+  document.getElementById('admin-metrics').innerHTML =
+    '<div class="metric"><div class="lbl">Garages publiés</div><div class="val">'+publishedCount+'</div></div>'
+    + '<div class="metric"><div class="lbl">Réservations actives</div><div class="val">'+activeBookings+' / '+totalSlots+'</div></div>'
+    + '<div class="metric"><div class="lbl">Volume confirmé</div><div class="val">'+grossRevenue.toLocaleString('fr-FR')+' €</div></div>'
+    + '<div class="metric"><div class="lbl">Commission (8%)</div><div class="val">'+commission.toLocaleString('fr-FR')+' €</div></div>';
+
+  if(!rows.length){
+    tableEl.innerHTML = '<p class="sub">Aucun garage sur la plateforme pour le moment.</p>';
+    return;
+  }
+  const trs = rows.map(r => {
+    const statusBadge = r.status==='published' ? '<span class="badge ok">Publié</span>' : r.status==='pending' ? '<span class="badge pending">En attente</span>' : '<span class="badge">Suspendu</span>';
+    return '<tr><td>'+r.garage_name+'</td><td>'+r.city+'</td><td>'+(r.occupancy_rate||0)+'%</td><td>'+Number(r.gross_revenue||0).toLocaleString('fr-FR')+' €</td><td>'+(r.open_disputes||0)+'</td><td>'+statusBadge+'</td></tr>';
+  }).join('');
+  tableEl.innerHTML = '<table><tr><th>Garage</th><th>Ville</th><th>Occupation</th><th>Revenu confirmé</th><th>Litiges</th><th>Statut</th></tr>'+trs+'</table>';
+}
+
+async function loadAdminUsers(){
+  const roles = ['client','owner','admin'];
+  const counts = {};
+  for(const r of roles){
+    const { count } = await sb.from('profiles').select('id', { count:'exact', head:true }).eq('role', r);
+    counts[r] = count || 0;
+  }
+  const total = counts.client + counts.owner + counts.admin;
+  document.getElementById('admin-users-metrics').innerHTML =
+    '<div class="metric"><div class="lbl">Clients</div><div class="val">'+counts.client+'</div></div>'
+    + '<div class="metric"><div class="lbl">Propriétaires</div><div class="val">'+counts.owner+'</div></div>'
+    + '<div class="metric"><div class="lbl">Admins</div><div class="val">'+counts.admin+'</div></div>'
+    + '<div class="metric"><div class="lbl">Total</div><div class="val">'+total+'</div></div>';
+}
+
+async function loadAdminListings(){
+  const { data, error } = await sb.rpc('get_admin_overview');
+  const el = document.getElementById('admin-listings-table');
+  if(error){ el.innerHTML = '<p class="sub">Erreur : ' + error.message + '</p>'; return; }
+  if(!data || !data.length){ el.innerHTML = '<p class="sub">Aucun garage enregistré.</p>'; return; }
+  const trs = data.map(r => {
+    const statusBadge = r.status==='published' ? '<span class="badge ok">Publié</span>' : '<span class="badge pending">En attente</span>';
+    return '<tr><td>'+r.garage_name+'</td><td>'+r.city+'</td><td>'+r.total_slots+'</td><td>'+r.price_per_month+' €/mois</td><td>'+statusBadge+'</td></tr>';
+  }).join('');
+  el.innerHTML = '<table><tr><th>Garage</th><th>Ville</th><th>Places</th><th>Tarif</th><th>Statut</th></tr>'+trs+'</table>';
+}
+
+async function loadAdminDisputes(){
+  const el = document.getElementById('admin-disputes-list');
+  const { data, error } = await sb
+    .from('bookings')
+    .select('id, date_in, date_out, slots(label, garages(name))')
+    .eq('status', 'disputed');
+  if(error){ el.innerHTML = '<p class="sub">Erreur : ' + error.message + '</p>'; return; }
+  if(!data || !data.length){
+    el.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div><h3>Aucun litige en cours</h3><p>Les états des lieux contestés apparaîtront ici, identifiés par garage et place uniquement.</p></div>';
+    return;
+  }
+  el.innerHTML = data.map(d => {
+    const garageName = d.slots && d.slots.garages ? d.slots.garages.name : 'Garage';
+    const slotLabel = d.slots ? d.slots.label : '-';
+    return '<div class="card"><div class="card-row"><div><h3>'+garageName+' - place n°'+slotLabel+'</h3>'
+      + '<div class="meta">Réservation #'+d.id.slice(0,8)+'</div></div><span class="badge flag">Ouvert</span></div></div>';
+  }).join('');
+}
+
 /* CARROUSEL D'AVIS */
+/* CARROUSEL D'AVIS (données réelles) */
+async function loadHeroReviews(){
+  const { data, error } = await sb
+    .from('reviews')
+    .select('rating, comment, garages(name, city)')
+    .order('created_at', { ascending:false })
+    .limit(6);
+  if(error || !data || !data.length) return; // garde le message par défaut
+
+  const track = document.getElementById('reviews-track');
+  const dots = document.getElementById('reviews-dots');
+  track.innerHTML = data.map((r,i) => {
+    const stars = '★'.repeat(r.rating) + '☆'.repeat(5-r.rating);
+    const loc = r.garages ? (r.garages.name + ', ' + r.garages.city) : '';
+    return '<div class="review-slide'+(i===0?' active':'')+'">'
+      + '<div class="review-stars">'+stars+'</div>'
+      + '<p class="review-text">"'+(r.comment||'')+'"</p>'
+      + '<p class="review-author">'+loc+'</p></div>';
+  }).join('');
+  dots.innerHTML = data.map((_,i)=>'<span class="rdot'+(i===0?' active':'')+'"></span>').join('');
+}
+loadHeroReviews();
+
 (function(){
   let reviewIndex = 0;
   function rotateReviews(){
     const slides = document.querySelectorAll('.review-slide');
     const dots = document.querySelectorAll('.rdot');
-    if(!slides.length) return;
+    if(slides.length < 2) return; // rien à faire tourner (0 ou 1 avis)
     slides[reviewIndex].classList.remove('active');
-    dots[reviewIndex].classList.remove('active');
+    if(dots[reviewIndex]) dots[reviewIndex].classList.remove('active');
     reviewIndex = (reviewIndex + 1) % slides.length;
     slides[reviewIndex].classList.add('active');
-    dots[reviewIndex].classList.add('active');
+    if(dots[reviewIndex]) dots[reviewIndex].classList.add('active');
   }
   setInterval(rotateReviews, 4500);
 })();
-
-/* raccourci démo : accès admin via triple-clic sur le logo */
-let clickCount=0, clickTimer=null;
-document.querySelector('.logo').addEventListener('click', function(){
-  clickCount++;
-  clearTimeout(clickTimer);
-  clickTimer = setTimeout(()=>{ clickCount=0; }, 500);
-  if(clickCount===3){ loginAs('Admin', 'admin'); clickCount=0; }
-});
 
 /* RESERVATION */
 let bookingState = { garage:'', loc:'', baseRate:45, slot:null };
@@ -958,19 +1187,19 @@ function openBooking(garageId){
   if(!window.currentRole){ openAuth('signup','client'); return; }
   const g = GARAGES.find(x => x.id === garageId);
   if(!g) return;
-  bookingState = { garage:g.name, loc:g.loc + ' - ' + g.distance + ' km', baseRate:g.price, slot:null };
+  bookingState = { garageId:g.id, garage:g.name, loc:g.loc + (g.distance<999 ? (' - ' + g.distance.toFixed(1).replace('.0','') + ' km') : ''), baseRate:g.price, slotId:null, slotLabel:null };
 
   document.getElementById('book-title').textContent = 'Réserver - ' + g.name;
   document.getElementById('book-loc').textContent = bookingState.loc;
-  document.getElementById('book-rating').textContent = g.rating + ' ★ (' + g.reviews + ' avis)';
+  document.getElementById('book-rating').textContent = g.rating ? (g.rating.toFixed(1) + ' ★ (' + g.reviewsCount + ' avis)') : 'Pas encore d\'avis';
 
   document.getElementById('book-options-list').innerHTML = g.options.length
     ? g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('')
     : '<span class="tag">Stockage simple, sans option supplémentaire</span>';
 
-  const slotsHtml = g.freeSlots.map(n => '<div class="slot-tile free" onclick="pickSlot(this)">'+n+'</div>').join('')
-    + g.bookedSlots.map(n => '<div class="slot-tile booked">'+n+'</div>').join('');
-  document.getElementById('book-slots').innerHTML = slotsHtml;
+  const slotsHtml = g.freeSlots.map(s => '<div class="slot-tile free" data-slot-id="'+s.id+'" onclick="pickSlot(this)">'+s.label+'</div>').join('')
+    + g.bookedSlots.map(s => '<div class="slot-tile booked">'+s.label+'</div>').join('');
+  document.getElementById('book-slots').innerHTML = slotsHtml || '<p class="sub">Aucune place configurée pour ce garage pour le moment.</p>';
 
   document.getElementById('client-book').closest('.main').querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('client-book').classList.add('active');
@@ -981,7 +1210,8 @@ function pickSlot(el){
   document.querySelectorAll('#book-slots .slot-tile.free').forEach(t=>{ t.style.borderWidth='1px'; t.style.borderColor=''; });
   el.style.borderWidth = '2px';
   el.style.borderColor = 'var(--orange)';
-  bookingState.slot = el.textContent.trim();
+  bookingState.slotId = el.dataset.slotId;
+  bookingState.slotLabel = el.textContent.trim();
   document.getElementById('err-slot').style.display='none';
   recalcBooking();
 }
@@ -1006,9 +1236,10 @@ function recalcBooking(){
   const subtotal = base + formuleTotal + insuranceTotal;
   const fee = subtotal * 0.08;
   const total = subtotal + fee;
+  bookingState.total = Math.round((subtotal) * 100) / 100;
 
   const fmt = n => n.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
-  document.getElementById('sum-slot').textContent = bookingState.slot || '-';
+  document.getElementById('sum-slot').textContent = bookingState.slotLabel || '-';
   document.getElementById('sum-months').textContent = months.toFixed(1).replace('.0','');
   document.getElementById('sum-base').textContent = fmt(base);
   document.getElementById('sum-formule').textContent = fmt(formuleTotal);
@@ -1017,13 +1248,13 @@ function recalcBooking(){
   document.getElementById('sum-total').textContent = fmt(total);
 }
 
-function confirmBooking(){
+async function confirmBooking(){
   const moto = document.getElementById('book-moto').value.trim();
   const dIn = document.getElementById('book-date-in').value;
   const dOut = document.getElementById('book-date-out').value;
   let valid = true;
 
-  if(!bookingState.slot){ document.getElementById('err-slot').style.display='block'; valid=false; }
+  if(!bookingState.slotId){ document.getElementById('err-slot').style.display='block'; valid=false; }
   else { document.getElementById('err-slot').style.display='none'; }
 
   const motoField = document.getElementById('book-moto').closest('.field');
@@ -1038,19 +1269,64 @@ function confirmBooking(){
   document.getElementById('err-general').style.display = valid ? 'none' : 'block';
   if(!valid) return;
 
-  const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
-  const list = document.getElementById('bookings-list');
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = '<div class="card-row"><div><h3>'+bookingState.garage+' - place n°'+bookingState.slot+'</h3>'
-    + '<div class="meta">'+fmtDate(dIn)+' → '+fmtDate(dOut)+' · '+moto+'</div></div>'
-    + '<span class="badge pending">En attente de confirmation propriétaire</span></div>';
-  list.prepend(card);
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user){ openAuth('login'); return; }
+
+  const { error } = await sb.from('bookings').insert({
+    slot_id: bookingState.slotId,
+    client_id: user.id,
+    moto_model: moto,
+    date_in: dIn,
+    date_out: dOut,
+    formule_prepa: document.getElementById('book-formule').value !== '0',
+    insurance: document.getElementById('book-insurance').checked,
+    total_price: bookingState.total,
+    status: 'pending'
+  });
+
+  if(error){
+    document.getElementById('err-general').textContent = 'Erreur lors de la réservation : ' + error.message;
+    document.getElementById('err-general').style.display = 'block';
+    return;
+  }
 
   document.querySelectorAll('#view-client .side-item').forEach(s=>s.classList.remove('active'));
   document.querySelector('[data-tab="client-bookings"]').classList.add('active');
   document.querySelectorAll('#view-client .tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('client-bookings').classList.add('active');
+  loadClientBookings();
+}
+
+async function loadClientBookings(){
+  const container = document.getElementById('bookings-list');
+  container.innerHTML = '<p class="sub">Chargement...</p>';
+  const { data: { user } } = await sb.auth.getUser();
+  if(!user) return;
+
+  const { data, error } = await sb
+    .from('bookings')
+    .select('id, moto_model, date_in, date_out, status, slots(label, garages(name))')
+    .eq('client_id', user.id)
+    .order('created_at', { ascending:false });
+
+  if(error){ console.error(error); container.innerHTML = '<p class="sub">Impossible de charger tes réservations.</p>'; return; }
+
+  if(!data || !data.length){
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M8 2v4M16 2v4M3 10h18"/></svg></div><h3>Aucune réservation pour le moment</h3><p>Trouve une place dans l\'onglet "Trouver une place" pour réserver ton premier emplacement.</p></div>';
+    return;
+  }
+
+  const badgeFor = s => s==='confirmed' ? '<span class="badge ok">Confirmée</span>' : s==='disputed' ? '<span class="badge flag">Litige</span>' : s==='cancelled' ? '<span class="badge">Annulée</span>' : '<span class="badge pending">En attente de confirmation propriétaire</span>';
+  const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
+
+  container.innerHTML = data.map(b => {
+    const garageName = b.slots && b.slots.garages ? b.slots.garages.name : 'Garage';
+    const slotLabel = b.slots ? b.slots.label : '-';
+    return '<div class="card"><div class="card-row"><div>'
+      + '<h3>'+garageName+' - place n°'+slotLabel+'</h3>'
+      + '<div class="meta">'+fmtDate(b.date_in)+' → '+fmtDate(b.date_out)+' · '+b.moto_model+'</div></div>'
+      + badgeFor(b.status) + '</div></div>';
+  }).join('');
 }
 </script>
 </body>
