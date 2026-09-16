@@ -75,6 +75,10 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .password-hint.valid{color:var(--green);}
 .forgot-link{font-size:12.5px;color:var(--metal-dark);text-align:right;cursor:pointer;margin:-6px 0 14px;}
 .forgot-link:hover{color:var(--orange-dark);text-decoration:underline;}
+.star-picker{display:flex;gap:6px;font-size:28px;}
+.star-picker .star{color:var(--line-strong);cursor:pointer;transition:color .1s;}
+.star-picker .star.filled{color:#E8B84B;}
+.review-done{font-size:12.5px;color:var(--green);font-weight:500;}
 .welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:14px 22px;border-radius:8px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .3s,transform .3s;z-index:200;max-width:90vw;text-align:center;}
 .welcome-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .modal-switch{font-size:13px;text-align:center;margin-top:16px;color:var(--metal);}
@@ -199,6 +203,38 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .msg-bubble.mine{align-self:flex-end;background:var(--orange);color:#fff;}
 .msg-bubble.theirs{align-self:flex-start;background:var(--paper);color:var(--ink);}
 .msg-time{font-size:10.5px;color:var(--metal);margin-top:2px;}
+
+/* INBOX (messagerie plein écran) */
+.inbox{display:grid;grid-template-columns:320px 1fr;height:calc(100vh - 170px);min-height:480px;margin:-28px -32px;border-top:1px solid var(--line);}
+.inbox-list{border-right:1px solid var(--line);overflow-y:auto;background:#fff;}
+.inbox-conv{padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;border-left:3px solid transparent;}
+.inbox-conv:hover{background:var(--paper);}
+.inbox-conv.active{background:#EEF2F8;border-left-color:var(--orange);}
+.inbox-conv h4{font-size:13.5px;margin:0 0 3px;font-weight:600;}
+.inbox-conv .meta{font-size:11.5px;color:var(--metal);}
+.inbox-conv .preview{font-size:12.5px;color:var(--metal-dark);margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.inbox-thread{display:flex;flex-direction:column;background:var(--paper);min-width:0;}
+.inbox-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--metal);gap:10px;font-size:13.5px;}
+.inbox-empty .icon{opacity:.35;}
+.inbox-header{padding:14px 22px;border-bottom:1px solid var(--line);background:#fff;display:flex;align-items:center;gap:10px;}
+.inbox-header h3{font-size:14.5px;margin:0;}
+.inbox-header .meta{font-size:11.5px;color:var(--metal);margin-top:2px;}
+.inbox-back{display:none;border:none;background:none;cursor:pointer;font-size:16px;color:var(--metal-dark);}
+.inbox-messages{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:10px;}
+.inbox-day-sep{text-align:center;font-size:11px;color:var(--metal);margin:8px 0;}
+.inbox-compose{border-top:1px solid var(--line);background:#fff;padding:14px 18px;display:flex;gap:10px;align-items:center;}
+.inbox-compose input{flex:1;padding:11px 16px;border:1px solid var(--line-strong);border-radius:22px;font-family:inherit;font-size:14px;}
+.inbox-compose input:focus{outline:none;border-color:var(--orange);}
+.inbox-send{border:none;background:var(--orange);color:#fff;width:40px;height:40px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .12s;}
+.inbox-send:hover{background:var(--orange-dark);}
+@media(max-width:760px){
+  .inbox{grid-template-columns:1fr;}
+  .inbox-list{display:block;}
+  .inbox-thread{display:none;}
+  .inbox.thread-open .inbox-list{display:none;}
+  .inbox.thread-open .inbox-thread{display:flex;}
+  .inbox-back{display:inline-block;}
+}
 .result-info h3{font-size:15px;margin-bottom:3px;}
 .result-info .meta{font-size:12.5px;color:var(--metal);margin-bottom:6px;}
 .result-tags{display:flex;gap:6px;flex-wrap:wrap;}
@@ -367,7 +403,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             <div class="field" style="flex:2;margin-bottom:0;">
               <label>Ville, code postal ou adresse</label>
               <div style="display:flex;gap:8px;">
-                <input type="text" id="s-location" value="Vienne, 38200" oninput="runSearch()">
+                <input type="text" id="s-location" placeholder="Ex: Vienne, 38200" oninput="runSearch()">
                 <button class="btn ghost small" onclick="useMyLocation()" title="Utiliser ma position actuelle">📍 Ma position</button>
               </div>
             </div>
@@ -375,9 +411,9 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
               <label>Rayon</label>
               <select id="s-radius" onchange="runSearch()">
                 <option value="5">5 km</option>
-                <option value="10" selected>10 km</option>
+                <option value="10">10 km</option>
                 <option value="25">25 km</option>
-                <option value="1000">Toute distance</option>
+                <option value="1000" selected>Toute distance</option>
               </select>
             </div>
           </div>
@@ -394,11 +430,11 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             </div>
             <div class="field" style="margin-bottom:0;">
               <label>Dépôt</label>
-              <input type="date" id="s-date-in" value="2026-11-03" onchange="runSearch()">
+              <input type="date" id="s-date-in" onchange="runSearch()">
             </div>
             <div class="field" style="margin-bottom:0;">
               <label>Retrait</label>
-              <input type="date" id="s-date-out" value="2027-03-15" onchange="runSearch()">
+              <input type="date" id="s-date-out" onchange="runSearch()">
             </div>
             <div class="field" style="margin-bottom:0;">
               <label>Trier par</label>
@@ -410,12 +446,13 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             </div>
           </div>
 
-          <div class="search-row" style="margin-bottom:0;">
+          <div class="search-row" style="margin-bottom:0;align-items:center;">
             <label class="opt-chip"><input type="checkbox" class="s-opt" value="assurance" onchange="runSearch()"> Assurance incluse</label>
             <label class="opt-chip"><input type="checkbox" class="s-opt" value="prepa" onchange="runSearch()"> Préparation hivernage</label>
             <label class="opt-chip"><input type="checkbox" class="s-opt" value="video" onchange="runSearch()"> Vidéosurveillance</label>
             <label class="opt-chip"><input type="checkbox" class="s-opt" value="acces24" onchange="runSearch()"> Accès 24/7</label>
             <label class="opt-chip"><input type="checkbox" class="s-opt" value="transport" onchange="runSearch()"> Transport dépôt/retrait</label>
+            <span class="nav-link" style="margin-left:auto;" onclick="resetSearchFilters()">Réinitialiser les filtres</span>
           </div>
         </div>
 
@@ -461,12 +498,12 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             <div style="display:flex;gap:12px;">
               <div class="field" data-req="true" style="flex:1">
                 <label>Date de dépôt</label>
-                <input type="date" id="book-date-in" value="2026-11-03" onchange="recalcBooking()">
+                <input type="date" id="book-date-in" onchange="refreshBookingSlots(); recalcBooking();">
                 <div class="field-error">Indique une date de dépôt.</div>
               </div>
               <div class="field" data-req="true" style="flex:1">
                 <label>Date de retrait</label>
-                <input type="date" id="book-date-out" value="2027-03-15" onchange="recalcBooking()">
+                <input type="date" id="book-date-out" onchange="refreshBookingSlots(); recalcBooking();">
                 <div class="field-error">Indique une date de retrait.</div>
               </div>
             </div>
@@ -512,7 +549,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             </div>
             <button class="btn primary block" style="margin-top:14px;" onclick="confirmBooking()">Confirmer la réservation</button>
             <div class="field-error" id="err-general" style="text-align:center;margin-top:8px;">Choisis une place et complète les champs requis.</div>
-            <p style="font-size:11.5px;color:var(--metal);margin-top:12px;margin-bottom:0;text-align:center;">Aucun débit avant confirmation du propriétaire.</p>
+            <p style="font-size:11.5px;color:var(--metal);margin-top:12px;margin-bottom:0;text-align:center;">Aucun débit avant confirmation du propriétaire. Il a généralement quelques jours pour répondre ; si la demande est refusée, tu en seras informé et aucun montant ne sera prélevé.</p>
           </div>
         </div>
       </div>
@@ -527,9 +564,15 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       </div>
 
       <div id="client-messages" class="tabpanel">
-        <h1>Messages</h1>
-        <p class="sub">Toutes tes conversations, réservation par réservation.</p>
-        <div id="client-conversations-list"><p class="sub">Chargement...</p></div>
+        <div class="inbox" id="client-inbox">
+          <div class="inbox-list" id="client-conversations-list"><p class="sub" style="padding:16px;">Chargement...</p></div>
+          <div class="inbox-thread" id="client-inbox-thread">
+            <div class="inbox-empty">
+              <div class="icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 1 1 8.5-8.5z"/></svg></div>
+              <p>Sélectionne une conversation pour l'ouvrir</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -593,9 +636,15 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       </div>
 
       <div id="owner-messages" class="tabpanel">
-        <h1>Messages</h1>
-        <p class="sub">Toutes les conversations avec tes clients, en un coup d'œil.</p>
-        <div id="owner-conversations-list"><p class="sub">Chargement...</p></div>
+        <div class="inbox" id="owner-inbox">
+          <div class="inbox-list" id="owner-conversations-list"><p class="sub" style="padding:16px;">Chargement...</p></div>
+          <div class="inbox-thread" id="owner-inbox-thread">
+            <div class="inbox-empty">
+              <div class="icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 11.5a8.38 8.38 0 0 1-8.5 8.5 8.5 8.5 0 1 1 8.5-8.5z"/></svg></div>
+              <p>Sélectionne une conversation pour l'ouvrir</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -652,6 +701,25 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   </div>
 </div>
 
+<!-- AVIS MODAL -->
+<div class="overlay" id="review-overlay">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="document.getElementById('review-overlay').classList.remove('open')">✕</button>
+    <h2 style="font-size:18px;">Laisser un avis</h2>
+    <p class="sub" id="review-garage-name" style="margin-bottom:18px;"></p>
+    <div class="star-picker" id="star-picker">
+      <span class="star" data-value="1" onclick="setRating(1)">★</span>
+      <span class="star" data-value="2" onclick="setRating(2)">★</span>
+      <span class="star" data-value="3" onclick="setRating(3)">★</span>
+      <span class="star" data-value="4" onclick="setRating(4)">★</span>
+      <span class="star" data-value="5" onclick="setRating(5)">★</span>
+    </div>
+    <textarea id="review-comment" placeholder="Ton expérience dans ce garage (optionnel)" style="width:100%;min-height:90px;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;font-family:inherit;font-size:14px;resize:vertical;margin-top:14px;"></textarea>
+    <p class="field-error" id="review-error" style="display:none;margin-top:6px;">Choisis une note avant d'envoyer.</p>
+    <button class="btn primary block" style="margin-top:14px;" onclick="submitReview()">Envoyer l'avis</button>
+  </div>
+</div>
+
 <!-- LEGAL MODAL -->
 <div class="overlay" id="legal-overlay">
   <div class="modal" style="max-width:520px;max-height:80vh;overflow-y:auto;">
@@ -696,19 +764,6 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   </div>
 </div>
 
-<!-- MESSAGERIE MODAL -->
-<div class="overlay" id="messages-overlay">
-  <div class="modal" style="max-width:480px;">
-    <button class="modal-close" onclick="closeMessages()">✕</button>
-    <h2 style="font-size:18px;">Messages</h2>
-    <p class="sub" style="margin-bottom:16px;">Échange sans partager tes coordonnées personnelles.</p>
-    <div id="messages-thread" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
-    <div style="display:flex;gap:8px;">
-      <input type="text" id="message-input" placeholder="Écrire un message..." style="flex:1;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;font-family:inherit;font-size:14px;">
-      <button class="btn primary small" onclick="sendMessage()">Envoyer</button>
-    </div>
-  </div>
-</div>
 
 <!-- AUTH MODAL -->
 <div class="overlay" id="auth-overlay">
@@ -949,6 +1004,10 @@ function showWelcomeToast(role){
   const msg = role === 'owner'
     ? 'Bienvenue sur GaroMoto ! Ajoute ton premier garage pour commencer à recevoir des demandes.'
     : 'Bienvenue sur GaroMoto ! Trouve une place qui te convient ci-dessous.';
+  showToast(msg);
+}
+
+function showToast(msg){
   const toast = document.createElement('div');
   toast.className = 'welcome-toast';
   toast.textContent = msg;
@@ -977,6 +1036,38 @@ function setSideTab(el, scope){
   el.classList.add('active');
   container.querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById(el.dataset.tab).classList.add('active');
+}
+
+/* DATES PAR DEFAUT DYNAMIQUES ("hiver prochain" : 1er nov. -> 15 mars) */
+function computeDefaultWinterDates(){
+  const now = new Date();
+  // Si on est après le 15 mars, on vise le 1er novembre de cette même année ;
+  // sinon (janvier-mi mars) l'hivernage en cours a déjà commencé l'année précédente.
+  const pastMidMarch = now.getMonth() > 2 || (now.getMonth() === 2 && now.getDate() > 15);
+  const depotYear = pastMidMarch ? now.getFullYear() : now.getFullYear() - 1;
+  const depot = new Date(depotYear, 10, 1);
+  const retrait = new Date(depotYear + 1, 2, 15);
+  const fmt = d => d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  return { depot: fmt(depot), retrait: fmt(retrait) };
+}
+
+function applyDefaultDates(){
+  const { depot, retrait } = computeDefaultWinterDates();
+  ['s-date-in','book-date-in'].forEach(id => { const el = document.getElementById(id); if(el && !el.value) el.value = depot; });
+  ['s-date-out','book-date-out'].forEach(id => { const el = document.getElementById(id); if(el && !el.value) el.value = retrait; });
+}
+applyDefaultDates();
+
+function resetSearchFilters(){
+  document.getElementById('s-location').value = '';
+  document.getElementById('s-radius').value = '1000';
+  document.getElementById('s-budget').value = '1000';
+  document.getElementById('s-sort').value = 'distance';
+  document.querySelectorAll('.s-opt').forEach(c => c.checked = false);
+  const { depot, retrait } = computeDefaultWinterDates();
+  document.getElementById('s-date-in').value = depot;
+  document.getElementById('s-date-out').value = retrait;
+  runSearch();
 }
 
 /* MOTEUR DE RECHERCHE CLIENT (données réelles Supabase) */
@@ -1038,7 +1129,7 @@ function slotsForPeriod(garage, dateIn, dateOut){
 
 function useMyLocation(){
   const input = document.getElementById('s-location');
-  if(!navigator.geolocation){ input.value = 'Position indisponible'; return; }
+  if(!navigator.geolocation){ input.value = ''; input.placeholder = 'Géolocalisation non disponible sur cet appareil'; return; }
   input.value = 'Localisation en cours...';
   navigator.geolocation.getCurrentPosition(
     function(pos){
@@ -1047,7 +1138,7 @@ function useMyLocation(){
       GARAGES.forEach(g => g.distance = haversine(userCoords.lat, userCoords.lng, g.latitude, g.longitude));
       runSearch();
     },
-    function(){ input.value = 'Vienne, 38200'; }
+    function(){ input.value = ''; input.placeholder = 'Autorisation refusée - tape ta ville manuellement'; }
   );
 }
 
@@ -1101,7 +1192,7 @@ function runSearch(){
       + '<div class="result-side">'
       + '<div class="result-price">'+g.price+' € <span>/mois</span></div>'
       + '<button class="btn small primary" onclick="openBooking(\'' + g.id + '\')">Réserver</button>'
-      + '<label class="compare-check"><input type="checkbox" '+checked+' onchange="toggleCompareId(\'' + g.id + '\',this.checked)"> Comparer</label>'
+      + '<label class="compare-check"><input type="checkbox" '+checked+' onchange="toggleCompareId(\'' + g.id + '\',this.checked,this)"> Comparer</label>'
       + '</div></div>';
   }).join('');
 
@@ -1141,9 +1232,17 @@ function renderResultsMap(list){
   }
 }
 
-function toggleCompareId(id, checked){
-  if(checked){ if(!compareIds.includes(id) && compareIds.length<3) compareIds.push(id); }
-  else { compareIds = compareIds.filter(i=>i!==id); }
+function toggleCompareId(id, checked, checkboxEl){
+  if(checked){
+    if(compareIds.length >= 3){
+      if(checkboxEl) checkboxEl.checked = false;
+      alert('Tu peux comparer 3 garages maximum à la fois. Retire-en un pour en ajouter un autre.');
+      return;
+    }
+    if(!compareIds.includes(id)) compareIds.push(id);
+  } else {
+    compareIds = compareIds.filter(i=>i!==id);
+  }
   document.getElementById('compare-toggle').style.display = compareIds.length>=2 ? 'inline' : 'none';
   document.getElementById('compare-n').textContent = compareIds.length;
   if(compareIds.length<2) document.getElementById('compare-panel').style.display='none';
@@ -1458,13 +1557,56 @@ async function loadConversations(scope){
   container.innerHTML = relevant.map(b => {
     const garageName = b.slots && b.slots.garages ? b.slots.garages.name : 'Garage';
     const slotLabel = b.slots ? b.slots.label : '-';
+    conversationsCache[b.id] = { garageName, slotLabel, moto: b.moto_model };
     const last = lastByBooking[b.id];
     const preview = last ? (last.content.length > 60 ? last.content.slice(0,60)+'…' : last.content) : 'Aucun message pour le moment';
-    return '<div class="card" style="cursor:pointer;" onclick="openMessages(\''+b.id+'\')">'
-      + '<div class="card-row"><div><h3>'+garageName+' - place n°'+slotLabel+'</h3>'
-      + '<div class="meta">'+b.moto_model+'</div></div></div>'
-      + '<p class="conv-preview">'+preview+'</p></div>';
+    const lastTime = last ? new Date(last.created_at).toLocaleDateString('fr-FR', { day:'2-digit', month:'2-digit' }) : '';
+    const isActive = b.id === activeBookingId ? ' active' : '';
+    return '<div class="inbox-conv'+isActive+'" data-booking-id="'+b.id+'" onclick="selectConversation(\''+scope+'\',\''+b.id+'\')">'
+      + '<div style="display:flex;justify-content:space-between;gap:8px;"><h4>'+garageName+' - n°'+slotLabel+'</h4><span class="meta">'+lastTime+'</span></div>'
+      + '<div class="meta">'+b.moto_model+'</div>'
+      + '<div class="preview">'+preview+'</div></div>';
   }).join('');
+}
+
+/* AVIS CLIENT */
+let reviewState = { garageId:null, rating:0 };
+
+function openReviewModal(garageId, garageName){
+  reviewState = { garageId, rating:0 };
+  document.getElementById('review-garage-name').textContent = garageName;
+  document.getElementById('review-comment').value = '';
+  document.getElementById('review-error').style.display = 'none';
+  document.querySelectorAll('#star-picker .star').forEach(s => s.classList.remove('filled'));
+  document.getElementById('review-overlay').classList.add('open');
+}
+
+function setRating(n){
+  reviewState.rating = n;
+  document.querySelectorAll('#star-picker .star').forEach(s => {
+    s.classList.toggle('filled', parseInt(s.dataset.value) <= n);
+  });
+  document.getElementById('review-error').style.display = 'none';
+}
+
+async function submitReview(){
+  if(!reviewState.rating){
+    document.getElementById('review-error').style.display = 'block';
+    return;
+  }
+  const comment = document.getElementById('review-comment').value.trim();
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('reviews').insert({
+    garage_id: reviewState.garageId, client_id: user.id, rating: reviewState.rating, comment: comment || null
+  });
+  if(error){
+    document.getElementById('review-error').textContent = 'Erreur : ' + error.message;
+    document.getElementById('review-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('review-overlay').classList.remove('open');
+  showToast('Merci pour ton avis !');
+  loadClientBookings();
 }
 
 /* MENTIONS LEGALES */
@@ -1495,49 +1637,89 @@ function openLegal(key){
   document.getElementById('legal-overlay').classList.add('open');
 }
 
-/* MESSAGERIE */
+/* MESSAGERIE PLEIN ECRAN (façon boîte de réception) */
 let activeBookingId = null;
+let activeInboxScope = null;
+let conversationsCache = {};
 
-async function openMessages(bookingId){
+// Ouvre directement la messagerie sur une conversation précise, depuis n'importe
+// quel bouton "Messages" du site (réservations, litiges, etc.)
+function openMessages(bookingId){
+  const scope = window.currentRole === 'owner' ? 'owner' : 'client';
+  document.querySelectorAll('.side-item').forEach(s=>s.classList.remove('active'));
+  const tab = document.querySelector('[data-tab="'+scope+'-messages"]');
+  if(tab) tab.classList.add('active');
+  document.querySelectorAll('#view-'+scope+' .tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById(scope+'-messages').classList.add('active');
+  loadConversations(scope).then(() => selectConversation(scope, bookingId));
+}
+
+async function selectConversation(scope, bookingId){
   activeBookingId = bookingId;
-  document.getElementById('messages-overlay').classList.add('open');
-  await loadMessages();
-}
-function closeMessages(){
-  document.getElementById('messages-overlay').classList.remove('open');
-  activeBookingId = null;
+  activeInboxScope = scope;
+  document.querySelectorAll('#'+scope+'-conversations-list .inbox-conv').forEach(el => {
+    el.classList.toggle('active', el.dataset.bookingId === bookingId);
+  });
+  document.getElementById(scope+'-inbox').classList.add('thread-open');
+
+  const conv = conversationsCache[bookingId] || {};
+  const threadPane = document.getElementById(scope+'-inbox-thread');
+  threadPane.innerHTML =
+    '<div class="inbox-header">'
+    + '<button class="inbox-back" onclick="closeThread(\''+scope+'\')">←</button>'
+    + '<div><h3>'+(conv.garageName||'Garage')+' - place n°'+(conv.slotLabel||'-')+'</h3>'
+    + '<div class="meta">'+(conv.moto||'')+'</div></div>'
+    + '</div>'
+    + '<div class="inbox-messages" id="'+scope+'-inbox-messages"><p class="sub" style="padding:16px;">Chargement...</p></div>'
+    + '<div class="inbox-compose">'
+    + '<input type="text" id="'+scope+'-message-input" placeholder="Écrire un message..." onkeydown="if(event.key===\'Enter\'){sendMessage(\''+scope+'\');}">'
+    + '<button class="inbox-send" onclick="sendMessage(\''+scope+'\')" aria-label="Envoyer">'
+    + '<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>'
+    + '</button></div>';
+
+  await loadThreadMessages(scope, bookingId);
 }
 
-async function loadMessages(){
-  const thread = document.getElementById('messages-thread');
-  thread.innerHTML = '<p class="sub">Chargement...</p>';
+function closeThread(scope){
+  document.getElementById(scope+'-inbox').classList.remove('thread-open');
+}
+
+async function loadThreadMessages(scope, bookingId){
+  const pane = document.getElementById(scope+'-inbox-messages');
   const { data: { user } } = await sb.auth.getUser();
   const { data, error } = await sb
     .from('messages')
     .select('id, content, sender_id, created_at')
-    .eq('booking_id', activeBookingId)
+    .eq('booking_id', bookingId)
     .order('created_at', { ascending:true });
 
-  if(error){ thread.innerHTML = '<p class="sub">Impossible de charger la conversation.</p>'; return; }
-  if(!data || !data.length){ thread.innerHTML = '<p class="sub">Aucun message pour le moment. Écris le premier !</p>'; return; }
+  if(error){ pane.innerHTML = '<p class="sub">Impossible de charger la conversation.</p>'; return; }
+  if(!data || !data.length){ pane.innerHTML = '<p class="sub" style="text-align:center;margin-top:30px;">Aucun message pour le moment. Écris le premier !</p>'; return; }
 
-  thread.innerHTML = data.map(m => {
+  let lastDay = null;
+  let html = '';
+  data.forEach(m => {
+    const d = new Date(m.created_at);
+    const dayLabel = d.toLocaleDateString('fr-FR', { day:'2-digit', month:'long' });
+    if(dayLabel !== lastDay){ html += '<div class="inbox-day-sep">'+dayLabel+'</div>'; lastDay = dayLabel; }
     const mine = m.sender_id === user.id;
-    const time = new Date(m.created_at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
-    return '<div class="msg-bubble '+(mine?'mine':'theirs')+'">'+m.content+'<div class="msg-time">'+time+'</div></div>';
-  }).join('');
-  thread.scrollTop = thread.scrollHeight;
+    const time = d.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit' });
+    html += '<div class="msg-bubble '+(mine?'mine':'theirs')+'">'+m.content+'<div class="msg-time">'+time+'</div></div>';
+  });
+  pane.innerHTML = html;
+  pane.scrollTop = pane.scrollHeight;
 }
 
-async function sendMessage(){
-  const input = document.getElementById('message-input');
+async function sendMessage(scope){
+  const input = document.getElementById(scope+'-message-input');
   const content = input.value.trim();
   if(!content || !activeBookingId) return;
   const { data: { user } } = await sb.auth.getUser();
   const { error } = await sb.from('messages').insert({ booking_id:activeBookingId, sender_id:user.id, content });
   if(error){ alert('Erreur : ' + error.message); return; }
   input.value = '';
-  await loadMessages();
+  await loadThreadMessages(scope, activeBookingId);
+  loadConversations(scope); // rafraîchit l'aperçu du dernier message dans la liste
 }
 
 /* ADMIN GOD MODE (aucune donnée personnelle) */
@@ -1715,8 +1897,6 @@ function openBooking(garageId){
   if(!window.currentRole){ openAuth('signup','client'); return; }
   const g = (window.currentResults || []).find(x => x.id === garageId) || GARAGES.find(x => x.id === garageId);
   if(!g) return;
-  const freeSlots = g.freeSlots || [];
-  const bookedSlots = g.bookedSlots || [];
   bookingState = { garageId:g.id, garage:g.name, loc:g.loc + (g.distance<999 ? (' - ' + g.distance.toFixed(1).replace('.0','') + ' km') : ''), baseRate:g.price, slotId:null, slotLabel:null };
 
   document.getElementById('book-title').textContent = 'Réserver - ' + g.name;
@@ -1727,13 +1907,46 @@ function openBooking(garageId){
     ? g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('')
     : '<span class="tag">Stockage simple, sans option supplémentaire</span>';
 
-  const slotsHtml = freeSlots.map(s => '<div class="slot-tile free" data-slot-id="'+s.id+'" onclick="pickSlot(this)">'+s.label+'</div>').join('')
-    + bookedSlots.map(s => '<div class="slot-tile booked">'+s.label+'</div>').join('');
-  document.getElementById('book-slots').innerHTML = slotsHtml || '<p class="sub">Aucune place configurée pour ce garage pour le moment.</p>';
+  // La formule et l'assurance ne s'affichent que si CE garage les propose réellement.
+  const formuleField = document.getElementById('book-formule').closest('.field');
+  const formuleSelect = document.getElementById('book-formule');
+  formuleSelect.innerHTML = '<option value="0">Stockage simple</option>'
+    + (g.options.includes('prepa') ? '<option value="15">+ prépa hivernage (+15 €/mois)</option>' : '');
+  formuleField.style.display = 'block';
+
+  const insuranceField = document.getElementById('book-insurance').closest('.field');
+  insuranceField.style.display = g.options.includes('assurance') ? 'block' : 'none';
+  document.getElementById('book-insurance').checked = false;
+
+  refreshBookingSlots();
 
   document.getElementById('client-book').closest('.main').querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('client-book').classList.add('active');
   recalcBooking();
+}
+
+// Recalcule les places libres/occupées pour CE garage selon les dates
+// actuellement choisies dans le formulaire (pas celles de la recherche).
+function refreshBookingSlots(){
+  const g = GARAGES.find(x => x.id === bookingState.garageId);
+  if(!g) return;
+  const dateIn = document.getElementById('book-date-in').value;
+  const dateOut = document.getElementById('book-date-out').value;
+  const { freeSlots, bookedSlots } = slotsForPeriod(g, dateIn, dateOut);
+
+  // Si la place déjà choisie n'est plus libre pour les nouvelles dates, on la désélectionne.
+  if(bookingState.slotId && !freeSlots.some(s => s.id === bookingState.slotId)){
+    bookingState.slotId = null;
+    bookingState.slotLabel = null;
+    document.getElementById('err-slot').textContent = 'La place choisie n\'est plus disponible pour ces dates - choisis-en une autre.';
+    document.getElementById('err-slot').style.display = 'block';
+  }
+
+  const slotsHtml = freeSlots.map(s => {
+    const selected = s.id === bookingState.slotId ? ' style="border-width:2px;border-color:var(--orange);"' : '';
+    return '<div class="slot-tile free" data-slot-id="'+s.id+'" onclick="pickSlot(this)"'+selected+'>'+s.label+'</div>';
+  }).join('') + bookedSlots.map(s => '<div class="slot-tile booked">'+s.label+'</div>').join('');
+  document.getElementById('book-slots').innerHTML = slotsHtml || '<p class="sub">Aucune place disponible pour ces dates.</p>';
 }
 
 function pickSlot(el){
@@ -1799,6 +2012,22 @@ async function confirmBooking(){
   document.getElementById('err-general').style.display = valid ? 'none' : 'block';
   if(!valid) return;
 
+  // Vérification serveur de dernière minute (contre une réservation concurrente
+  // survenue depuis le chargement de la recherche).
+  const { data: stillAvailable, error: availError } = await sb.rpc('slot_is_available', {
+    p_slot_id: bookingState.slotId, p_date_in: dIn, p_date_out: dOut
+  });
+  if(availError){
+    document.getElementById('err-general').textContent = 'Impossible de vérifier la disponibilité, réessaie.';
+    document.getElementById('err-general').style.display = 'block';
+    return;
+  }
+  if(stillAvailable === false){
+    document.getElementById('err-general').textContent = 'Cette place vient d\'être réservée par quelqu\'un d\'autre pour ces dates. Choisis une autre place ou d\'autres dates.';
+    document.getElementById('err-general').style.display = 'block';
+    refreshBookingSlots();
+    return;
+  }
   const { data: { user } } = await sb.auth.getUser();
   if(!user){ openAuth('login'); return; }
 
@@ -1824,6 +2053,7 @@ async function confirmBooking(){
   document.querySelector('[data-tab="client-bookings"]').classList.add('active');
   document.querySelectorAll('#view-client .tabpanel').forEach(p=>p.classList.remove('active'));
   document.getElementById('client-bookings').classList.add('active');
+  showToast('Demande envoyée ! Le propriétaire va la confirmer ou la refuser sous peu.');
   loadClientBookings();
 }
 
@@ -1835,7 +2065,7 @@ async function loadClientBookings(){
 
   const { data, error } = await sb
     .from('bookings')
-    .select('id, moto_model, date_in, date_out, status, slots(label, garages(name))')
+    .select('id, moto_model, date_in, date_out, status, slots(label, garages(id, name))')
     .eq('client_id', user.id)
     .order('created_at', { ascending:false });
 
@@ -1846,17 +2076,36 @@ async function loadClientBookings(){
     return;
   }
 
+  const { data: myReviews } = await sb.from('reviews').select('garage_id').eq('client_id', user.id);
+  const reviewedGarageIds = (myReviews||[]).map(r=>r.garage_id);
+
   const badgeFor = s => s==='confirmed' ? '<span class="badge ok">Confirmée</span>' : s==='disputed' ? '<span class="badge flag">Litige</span>' : s==='cancelled' ? '<span class="badge">Annulée</span>' : s==='rejected' ? '<span class="badge">Refusée par le propriétaire</span>' : '<span class="badge pending">En attente de confirmation propriétaire</span>';
   const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
+  const today = new Date().toISOString().slice(0,10);
 
   container.innerHTML = data.map(b => {
-    const garageName = b.slots && b.slots.garages ? b.slots.garages.name : 'Garage';
+    const garage = b.slots && b.slots.garages ? b.slots.garages : null;
+    const garageName = garage ? garage.name : 'Garage';
     const slotLabel = b.slots ? b.slots.label : '-';
+    const stayOver = b.status === 'confirmed' && b.date_out < today;
+    const alreadyReviewed = garage && reviewedGarageIds.includes(garage.id);
+
+    let reviewAction = '';
+    if(stayOver){
+      reviewAction = alreadyReviewed
+        ? '<span class="review-done">✓ Avis envoyé</span>'
+        : '<button class="btn small primary" onclick="openReviewModal(\''+garage.id+'\',\''+garageName.replace(/'/g,"\\'")+'\')">Laisser un avis</button>';
+    }
+
     return '<div class="card"><div class="card-row"><div>'
       + '<h3>'+garageName+' - place n°'+slotLabel+'</h3>'
       + '<div class="meta">'+fmtDate(b.date_in)+' → '+fmtDate(b.date_out)+' · '+b.moto_model+'</div></div>'
       + badgeFor(b.status) + '</div>'
-      + '<div style="margin-top:10px;display:flex;gap:8px;"><button class="btn small ghost" onclick="openInspection(\''+b.id+'\')">État des lieux</button><button class="btn small ghost" onclick="openMessages(\''+b.id+'\')">Messages</button></div></div>';
+      + '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">'
+      + '<button class="btn small ghost" onclick="openInspection(\''+b.id+'\')">État des lieux</button>'
+      + '<button class="btn small ghost" onclick="openMessages(\''+b.id+'\')">Messages</button>'
+      + reviewAction
+      + '</div></div>';
   }).join('');
 }
 </script>
