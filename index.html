@@ -80,6 +80,31 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .star-picker .star.filled{color:#E8B84B;}
 .review-done{font-size:12.5px;color:var(--green);font-weight:500;}
 .cancel-btn{color:var(--orange-dark);border-color:var(--line-strong);}
+
+/* ASSISTANT D'AIDE */
+.help-fab{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;background:var(--ink);color:var(--paper);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.2);z-index:150;transition:transform .15s;}
+.help-fab:hover{transform:scale(1.06);}
+.help-panel{position:fixed;bottom:88px;right:24px;width:360px;max-width:calc(100vw - 32px);height:480px;max-height:calc(100vh - 120px);background:#fff;border-radius:14px;box-shadow:0 16px 44px rgba(0,0,0,.18);display:none;flex-direction:column;overflow:hidden;z-index:150;border:1px solid var(--line);}
+.help-panel.open{display:flex;}
+.help-header{padding:16px 18px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;background:var(--ink);color:var(--paper);}
+.help-header h3{font-size:15px;margin:0 0 3px;font-family:'Roboto Slab',serif;}
+.help-header p{font-size:12px;margin:0;opacity:.7;}
+.help-close{background:none;border:none;color:var(--paper);opacity:.7;cursor:pointer;font-size:15px;}
+.help-close:hover{opacity:1;}
+.help-body{flex:1;overflow-y:auto;padding:16px 18px;display:flex;flex-direction:column;gap:10px;background:var(--paper);}
+.help-msg{max-width:88%;padding:10px 13px;border-radius:12px;font-size:13.5px;line-height:1.5;}
+.help-msg.bot{align-self:flex-start;background:#fff;border:1px solid var(--line);}
+.help-msg.user{align-self:flex-end;background:var(--orange);color:#fff;}
+.help-chips{display:flex;flex-direction:column;gap:6px;align-self:stretch;}
+.help-chip{text-align:left;background:#fff;border:1px solid var(--line-strong);border-radius:8px;padding:9px 12px;font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit;}
+.help-chip:hover{border-color:var(--orange);color:var(--orange-dark);}
+.help-compose{border-top:1px solid var(--line);padding:12px 14px;display:flex;gap:8px;background:#fff;}
+.help-compose input{flex:1;padding:9px 13px;border:1px solid var(--line-strong);border-radius:20px;font-family:inherit;font-size:13.5px;}
+.help-compose input:focus{outline:none;border-color:var(--orange);}
+@media(max-width:480px){
+  .help-panel{right:16px;left:16px;width:auto;bottom:82px;}
+  .help-fab{right:16px;bottom:16px;}
+}
 .welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:14px 22px;border-radius:8px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .3s,transform .3s;z-index:200;max-width:90vw;text-align:center;}
 .welcome-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .modal-switch{font-size:13px;text-align:center;margin-top:16px;color:var(--metal);}
@@ -1578,6 +1603,135 @@ async function cancelBooking(bookingId){
   loadClientBookings();
 }
 
+/* ASSISTANT D'AIDE (FAQ contextuelle) */
+const HELP_FAQ = [
+  { id:'howItWorks', keywords:['marche','fonctionne','fonctionnement','principe'],
+    q:'Comment fonctionne GaroMoto ?',
+    a:'GaroMoto met en relation les motards qui cherchent une place de garage avec ceux qui en ont une libre. Tu crées un compte, tu indiques ton besoin (ou ta place disponible), et on vous met en relation. Aucune réservation n\'est débitée avant que le propriétaire l\'ait confirmée.' },
+  { id:'booking', keywords:['réserver','réserve','booking','comment faire une demande'],
+    q:'Comment réserver une place ?',
+    a:'Depuis "Trouver une place", filtre par zone/budget/dates, clique "Réserver" sur le garage qui t\'intéresse, choisis une place libre et tes dates, puis confirme. Le propriétaire a ensuite quelques jours pour accepter ou refuser ta demande - rien n\'est débité avant sa confirmation.' },
+  { id:'cancel', keywords:['annuler','annulation','rétracter'],
+    q:'Puis-je annuler une réservation ?',
+    a:'Oui, tant que le propriétaire n\'a pas encore confirmé ta demande : va dans "Mes réservations" et clique "Annuler la demande". Une fois confirmée, l\'annulation n\'est pas encore automatisée - contacte le propriétaire par messagerie.' },
+  { id:'becomeOwner', keywords:['propriétaire','proposer','ajouter garage','louer mon garage','place disponible'],
+    q:'Comment proposer mon garage ?',
+    a:'Crée un compte "Je propose ma place", puis dans "Mes garages" clique "Ajouter un garage" : indique le nom, la ville, le tarif et le nombre de places. Ton annonce doit ensuite être validée par un administrateur avant d\'apparaître dans les recherches.' },
+  { id:'options', keywords:['option','assurance','prépa','hivernage','vidéosurveillance','transport','accès 24'],
+    q:'À quoi servent les options des garages ?',
+    a:'Chaque propriétaire choisit les options qu\'il propose sur son garage : assurance incluse, préparation hivernage (batterie, pneus), vidéosurveillance, accès 24/7, ou transport dépôt/retrait. Elles varient d\'un garage à l\'autre - tu les vois avant de réserver.' },
+  { id:'price', keywords:['prix','tarif','coûte','combien','commission','frais'],
+    q:'Combien ça coûte ?',
+    a:'Le tarif est fixé par chaque propriétaire (généralement 35 à 70 €/mois selon les options). Des frais de service de 8% s\'ajoutent au moment de la réservation, reversés à la plateforme.' },
+  { id:'identity', keywords:['identité','vérification','vérifier','document','carte identité'],
+    q:'Pourquoi vérifier mon identité ?',
+    a:'La vérification d\'identité rassure les autres utilisateurs (propriétaire comme client). Envoie un document depuis le menu de ton profil > "Vérification d\'identité" - un badge "Identité vérifiée" apparaît une fois validé par un administrateur.' },
+  { id:'dispute', keywords:['litige','problème','contester','dégât','rayure','vol'],
+    q:'Un problème avec ma réservation ?',
+    a:'En cas de désaccord (état des lieux contesté, dégât constaté...), utilise d\'abord la messagerie pour en discuter avec l\'autre partie. Si ça ne se règle pas, le dossier peut être escaladé à un administrateur qui compare les photos d\'état des lieux dépôt/retrait.' },
+  { id:'messages', keywords:['message','contacter','discuter','écrire'],
+    q:'Comment contacter le propriétaire ou le client ?',
+    a:'Depuis l\'onglet "Messages" ou le bouton "Messages" d\'une réservation - tout se passe dans l\'appli, sans échanger vos coordonnées personnelles.' },
+  { id:'inspection', keywords:['état des lieux','photo','dépôt','retrait'],
+    q:'À quoi sert l\'état des lieux photo ?',
+    a:'À l\'arrivée puis au retrait de la moto, ajoute une photo depuis le bouton "État des lieux" de la réservation. Ça sert de preuve en cas de désaccord sur l\'état de la moto ou du garage.' },
+];
+
+const HELP_CONTEXT_CHIPS = {
+  'view-landing': ['howItWorks','becomeOwner','price'],
+  'client-search': ['booking','options','price'],
+  'client-book': ['booking','cancel','price'],
+  'client-bookings': ['cancel','dispute','messages'],
+  'client-messages': ['messages'],
+  'owner-garages': ['becomeOwner','options'],
+  'owner-bookings': ['dispute','messages'],
+  'owner-messages': ['messages'],
+  'owner-revenue': ['price'],
+  'default': ['howItWorks','booking','messages']
+};
+
+function getHelpContext(){
+  const activeView = document.querySelector('.view.active');
+  if(!activeView) return 'default';
+  const activeTab = activeView.querySelector('.tabpanel.active');
+  return (activeTab && activeTab.id) || activeView.id || 'default';
+}
+
+function toggleHelp(){
+  const panel = document.getElementById('help-panel');
+  const opening = !panel.classList.contains('open');
+  panel.classList.toggle('open');
+  if(opening && document.getElementById('help-body').children.length === 0){
+    addHelpBotMessage('Bonjour ! Je peux répondre aux questions les plus fréquentes sur GaroMoto. Choisis un sujet ou écris ta question.');
+    showHelpChips(getHelpContext());
+  }
+}
+
+function addHelpBotMessage(text){
+  const body = document.getElementById('help-body');
+  const el = document.createElement('div');
+  el.className = 'help-msg bot';
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+}
+
+function addHelpUserMessage(text){
+  const body = document.getElementById('help-body');
+  const el = document.createElement('div');
+  el.className = 'help-msg user';
+  el.textContent = text;
+  body.appendChild(el);
+  body.scrollTop = body.scrollHeight;
+}
+
+function showHelpChips(context){
+  const ids = HELP_CONTEXT_CHIPS[context] || HELP_CONTEXT_CHIPS.default;
+  const body = document.getElementById('help-body');
+  const wrap = document.createElement('div');
+  wrap.className = 'help-chips';
+  ids.forEach(id => {
+    const item = HELP_FAQ.find(f => f.id === id);
+    if(!item) return;
+    const btn = document.createElement('button');
+    btn.className = 'help-chip';
+    btn.textContent = item.q;
+    btn.onclick = () => answerHelpQuestion(item);
+    wrap.appendChild(btn);
+  });
+  body.appendChild(wrap);
+  body.scrollTop = body.scrollHeight;
+}
+
+function answerHelpQuestion(item){
+  addHelpUserMessage(item.q);
+  addHelpBotMessage(item.a);
+  showHelpChips(getHelpContext());
+}
+
+function askHelp(){
+  const input = document.getElementById('help-input');
+  const question = input.value.trim();
+  if(!question) return;
+  addHelpUserMessage(question);
+  input.value = '';
+
+  const lower = question.toLowerCase();
+  let best = null, bestScore = 0;
+  HELP_FAQ.forEach(item => {
+    const matched = item.keywords.filter(k => lower.includes(k));
+    const score = matched.reduce((sum,k) => sum + k.length, 0); // favorise les mots-clés les plus spécifiques
+    if(score > bestScore){ bestScore = score; best = item; }
+  });
+
+  if(best){
+    addHelpBotMessage(best.a);
+  } else {
+    addHelpBotMessage('Je n\'ai pas de réponse toute prête à ça. Le plus rapide : contacte directement la personne concernée via la messagerie de ta réservation.');
+  }
+  showHelpChips(getHelpContext());
+}
+
 /* AVIS CLIENT */
 let reviewState = { garageId:null, rating:0 };
 
@@ -2122,5 +2276,25 @@ async function loadClientBookings(){
   }).join('');
 }
 </script>
+<!-- ASSISTANT D'AIDE -->
+<button class="help-fab" id="help-fab" onclick="toggleHelp()" aria-label="Aide">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 2-3 4"/><circle cx="12" cy="17.5" r=".6" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="10"/></svg>
+</button>
+
+<div class="help-panel" id="help-panel">
+  <div class="help-header">
+    <div>
+      <h3>Assistant GaroMoto</h3>
+      <p>Pose une question ou choisis un sujet ci-dessous.</p>
+    </div>
+    <button class="help-close" onclick="toggleHelp()">✕</button>
+  </div>
+  <div class="help-body" id="help-body"></div>
+  <div class="help-compose">
+    <input type="text" id="help-input" placeholder="Écris ta question..." onkeydown="if(event.key==='Enter'){askHelp();}">
+    <button class="inbox-send" onclick="askHelp()" aria-label="Envoyer"><svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></button>
+  </div>
+</div>
+
 </body>
 </html>
