@@ -7,8 +7,8 @@
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@500;700&family=Inter:wght@400;500;600&display=swap');
 :root{
-  --ink:#1A1A1A; --paper:#F6F4EF; --orange:#E8532B; --orange-dark:#C0432B;
-  --metal:#8B8B85; --metal-dark:#4A4944; --green:#4A7856; --line:#E2DED3; --line-strong:#CFC9BA;
+  --ink:#1B2430; --paper:#F5F6F8; --orange:#2F5DAA; --orange-dark:#234A87;
+  --metal:#8A8F98; --metal-dark:#4B5563; --green:#3D7A5C; --line:#E2E5EA; --line-strong:#CBD1DA;
   --card:#FFFFFF;
 }
 *{box-sizing:border-box;}
@@ -22,13 +22,15 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .logo{font-size:20px;cursor:pointer;}
 .logo span{color:var(--orange);}
 .nav-right{display:flex;align-items:center;gap:14px;}
-.nav-link{font-size:14px;color:var(--metal-dark);cursor:pointer;}
-.btn{border:1px solid var(--ink);background:transparent;padding:9px 16px;font-size:14px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:500;transition:background .12s;}
-.btn:hover{background:#00000006;}
+.nav-link{font-size:14px;color:var(--metal-dark);cursor:pointer;padding:6px 10px;border-radius:6px;transition:background .12s,color .12s;}
+.nav-link:hover{background:var(--paper);color:var(--ink);}
+.btn{border:1px solid var(--ink);background:transparent;padding:9px 16px;font-size:14px;border-radius:6px;cursor:pointer;font-family:inherit;font-weight:500;transition:background .12s,color .12s,border-color .12s,box-shadow .12s;}
+.btn:hover{background:var(--ink);color:var(--paper);}
 .btn.primary{background:var(--orange);color:#fff;border-color:var(--orange);}
-.btn.primary:hover{background:#D6431F;}
+.btn.primary:hover{background:var(--orange-dark);border-color:var(--orange-dark);color:#fff;box-shadow:0 2px 10px #2F5DAA33;}
+.btn.ghost{border-color:var(--line-strong);color:var(--metal-dark);background:#fff;}
+.btn.ghost:hover{background:var(--paper);color:var(--ink);border-color:var(--metal);}
 .btn.small{padding:6px 12px;font-size:13px;}
-.btn.ghost{border-color:var(--line-strong);color:var(--metal-dark);}
 .btn.block{width:100%;}
 
 .user-chip{display:flex;align-items:center;gap:9px;border:1px solid var(--line-strong);border-radius:24px;padding:5px 14px 5px 5px;cursor:pointer;background:#fff;position:relative;}
@@ -55,10 +57,11 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .field{margin-bottom:14px;}
 .field label{display:block;font-size:12.5px;font-weight:500;margin-bottom:5px;}
 .field input,.field select{width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;font-size:14px;font-family:inherit;background:#fff;}
-.field input:focus,.field select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px #E8532B22;}
+.field input:focus,.field select:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px #2F5DAA22;}
 .role-pick{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
-.role-opt{border:1px solid var(--line-strong);border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;}
-.role-opt.selected{border-color:var(--orange);background:#FCEFE9;color:var(--orange-dark);}
+.role-opt{border:1px solid var(--line-strong);border-radius:8px;padding:12px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;transition:border-color .12s,background .12s;}
+.role-opt:hover{border-color:var(--metal);background:var(--paper);}
+.role-opt.selected{border-color:var(--orange);background:#EAF0F9;color:var(--orange-dark);}
 .field-error{font-size:12px;color:var(--orange-dark);margin-top:4px;display:none;}
 .field.error input{border-color:var(--orange-dark);}
 .field.error .field-error{display:block;}
@@ -72,24 +75,25 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .hero-split{display:grid;grid-template-columns:1.05fr 0.95fr;gap:48px;align-items:center;padding:68px 32px 56px;}
 .hero-text h1{font-size:36px;line-height:1.2;margin-bottom:16px;letter-spacing:-.01em;}
 .hero-text p{font-size:16px;color:var(--metal-dark);line-height:1.6;margin-bottom:28px;max-width:440px;}
-.eyebrow{display:inline-block;font-size:12.5px;color:var(--orange-dark);font-weight:500;background:#FCEFE9;padding:6px 14px;border-radius:20px;margin-bottom:20px;}
+.eyebrow{display:inline-block;font-size:12.5px;color:var(--orange-dark);font-weight:500;background:#EAF0F9;padding:6px 14px;border-radius:20px;margin-bottom:20px;}
 .hero-ctas{display:flex;gap:10px;}
 .hero-visual{display:flex;justify-content:center;}
-.garage-card{background:var(--ink);border-radius:14px;padding:24px;width:100%;max-width:320px;}
-.garage-title{color:var(--paper);font-size:12px;letter-spacing:.02em;margin:0 0 16px;opacity:.65;font-weight:500;}
-.hero-slots{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;}
-.hero-slot{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:'Roboto Slab',serif;font-size:17px;font-weight:700;}
-.hero-slot.free{background:#25382C;color:#8FD1A6;border:1px dashed #3C5D48;}
-.hero-slot.taken{background:#33322E;color:#6B6B67;}
-.hero-legend{display:flex;gap:18px;margin-top:16px;font-size:12px;color:var(--paper);opacity:.7;align-items:center;}
-.dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:6px;}
-.dot.free{background:#8FD1A6;}
-.dot.taken{background:#6B6B67;}
+.reviews-card{background:var(--ink);border-radius:14px;padding:28px;width:100%;max-width:340px;min-height:220px;display:flex;flex-direction:column;justify-content:space-between;}
+.reviews-title{color:var(--paper);font-size:12px;letter-spacing:.02em;margin:0 0 18px;opacity:.6;font-weight:500;text-transform:uppercase;}
+.reviews-track{position:relative;flex:1;}
+.review-slide{display:none;}
+.review-slide.active{display:block;}
+.review-stars{color:#E8B84B;font-size:14px;letter-spacing:2px;margin-bottom:12px;}
+.review-text{color:var(--paper);font-size:15px;line-height:1.55;margin:0 0 16px;font-style:italic;}
+.review-author{color:var(--paper);opacity:.6;font-size:12.5px;margin:0;}
+.reviews-dots{display:flex;gap:6px;margin-top:16px;}
+.rdot{width:6px;height:6px;border-radius:50%;background:#ffffff30;}
+.rdot.active{background:var(--paper);}
 
 @media(max-width:760px){
   .hero-split{grid-template-columns:1fr;padding-top:44px;}
   .hero-visual{order:-1;}
-  .garage-card{max-width:280px;margin:0 auto;}
+  .reviews-card{max-width:300px;margin:0 auto;}
 }
 
 /* LANDING (legacy, kept for compat) */
@@ -97,7 +101,7 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .choice-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:0 32px 56px;}
 .choice-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:26px;transition:border-color .15s;}
 .choice-card:hover{border-color:var(--line-strong);}
-.choice-card .icon{width:40px;height:40px;border-radius:10px;background:#FCEFE9;color:var(--orange-dark);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.choice-card .icon{width:40px;height:40px;border-radius:10px;background:#EAF0F9;color:var(--orange-dark);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
 .choice-card h3{font-size:18px;margin-bottom:8px;}
 .choice-card p{font-size:14px;color:var(--metal-dark);line-height:1.55;margin-bottom:18px;}
 
@@ -111,7 +115,8 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 /* DASHBOARD SHELL */
 .shell{display:grid;grid-template-columns:200px 1fr;min-height:70vh;}
 .sidebar{border-right:1px solid var(--line);padding:22px 14px;}
-.side-item{padding:9px 14px;font-size:13.5px;border-radius:7px;cursor:pointer;color:var(--metal-dark);margin-bottom:2px;}
+.side-item{padding:9px 14px;font-size:13.5px;border-radius:7px;cursor:pointer;color:var(--metal-dark);margin-bottom:2px;transition:background .12s;}
+.side-item:hover{background:var(--paper);}
 .side-item.active{background:var(--ink);color:var(--paper);font-weight:500;}
 .side-label{font-size:11px;color:var(--metal);text-transform:uppercase;letter-spacing:.03em;padding:0 14px;margin:14px 0 8px;}
 .main{padding:28px 32px;}
@@ -173,7 +178,6 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
 <header class="nav">
   <div class="logo" onclick="goLanding()">Garo<span>Moto</span></div>
   <div class="nav-right" id="nav-logged-out">
-    <span class="nav-link" onclick="showPublicSearch()">Trouver une place</span>
     <span class="nav-link" onclick="openAuth('login')">Se connecter</span>
     <button class="btn primary small" onclick="openAuth('signup')">Créer un compte</button>
   </div>
@@ -197,7 +201,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="wrap">
     <div class="hero-split">
       <div class="hero-text">
-        <span class="eyebrow">Actuellement en test — secteur Vienne / Lyon</span>
+        <span class="eyebrow">Actuellement en test - secteur Vienne / Lyon</span>
         <h1>Une place de garage pour ta moto cet hiver, chez un motard du coin.</h1>
         <p>GaroMoto met en relation les motards qui ont une place de garage libre avec ceux qui en cherchent une pour l'hivernage. Crée un compte pour signaler ton besoin ou proposer ta place.</p>
         <div class="hero-ctas">
@@ -206,23 +210,38 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         </div>
       </div>
       <div class="hero-visual">
-        <div class="garage-card">
-          <p class="garage-title">Garage de Julien — Vienne (38)</p>
-          <div class="hero-slots">
-            <div class="hero-slot taken">1</div>
-            <div class="hero-slot free">2</div>
-            <div class="hero-slot free">3</div>
-            <div class="hero-slot taken">4</div>
-            <div class="hero-slot free">5</div>
-            <div class="hero-slot taken">6</div>
-            <div class="hero-slot taken">7</div>
-            <div class="hero-slot free">8</div>
+        <div class="reviews-card">
+          <p class="reviews-title" id="review-source">Avis vérifiés</p>
+          <div class="reviews-track" id="reviews-track">
+            <div class="review-slide active">
+              <div class="review-stars">★★★★★</div>
+              <p class="review-text">"Dépôt et récupération hyper simples, la moto était parfaitement au sec tout l'hiver."</p>
+              <p class="review-author">T. Lambert - Garage de Julien, Vienne</p>
+            </div>
+            <div class="review-slide">
+              <div class="review-stars">★★★★★</div>
+              <p class="review-text">"Propriétaire réactif, état des lieux clair à l'arrivée et au départ. Aucune mauvaise surprise."</p>
+              <p class="review-author">C. Nguyen - Box sécurisé Sud-Vienne</p>
+            </div>
+            <div class="review-slide">
+              <div class="review-stars">★★★★☆</div>
+              <p class="review-text">"Très bon rapport qualité-prix, juste un peu loin de chez moi mais ça valait le coup."</p>
+              <p class="review-author">S. Morel - Hangar de Mathieu, Chonas</p>
+            </div>
           </div>
-          <div class="hero-legend">
-            <span><i class="dot free"></i>Libre</span>
-            <span><i class="dot taken"></i>Occupée</span>
+          <div class="reviews-dots" id="reviews-dots">
+            <span class="rdot active"></span><span class="rdot"></span><span class="rdot"></span>
           </div>
         </div>
+      </div>
+    </div>
+
+    <div class="how">
+      <h2>Comment ça marche</h2>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h4>Tu crées un compte</h4><p>Client ou propriétaire - deux minutes, avec vérification d'identité pour la confiance de tous.</p></div>
+        <div class="step"><div class="num">2</div><h4>On te met en relation</h4><p>Dès qu'une place correspond à une demande dans le même secteur, on rapproche les deux parties.</p></div>
+        <div class="step"><div class="num">3</div><h4>Vous vous arrangez, en confiance</h4><p>État des lieux photo à l'arrivée et au départ, pour que tout soit clair des deux côtés.</p></div>
       </div>
     </div>
 
@@ -233,7 +252,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         </div>
         <h3>Pour les motards</h3>
         <p>Indique ta zone, ton budget et le modèle de ta moto. On te met en relation dès qu'une place correspond, sans engagement.</p>
-        <button class="btn ghost block" onclick="openAuth('signup','client')">Créer un compte client</button>
+        <button class="btn ghost block" onclick="openAuth('signup','client')">Je cherche une place</button>
       </div>
       <div class="choice-card">
         <div class="icon">
@@ -241,20 +260,11 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         </div>
         <h3>Pour les propriétaires</h3>
         <p>Garage, box ou hangar avec une ou plusieurs places libres. Tu restes libre du prix, des conditions et du nombre de places proposées.</p>
-        <button class="btn ghost block" onclick="openAuth('signup','owner')">Créer un compte propriétaire</button>
-      </div>
-    </div>
-
-    <div class="how">
-      <h2>Comment ça marche</h2>
-      <div class="steps">
-        <div class="step"><div class="num">1</div><h4>Tu crées un compte</h4><p>Client ou propriétaire — deux minutes, avec vérification d'identité pour la confiance de tous.</p></div>
-        <div class="step"><div class="num">2</div><h4>On te met en relation</h4><p>Dès qu'une place correspond à une demande dans le même secteur, on rapproche les deux parties.</p></div>
-        <div class="step"><div class="num">3</div><h4>Vous vous arrangez, en confiance</h4><p>État des lieux photo à l'arrivée et au départ, pour que tout soit clair des deux côtés.</p></div>
+        <button class="btn ghost block" onclick="openAuth('signup','owner')">J'ai une place disponible</button>
       </div>
     </div>
   </div>
-  <footer class="site">GaroMoto — plateforme en phase de test, secteur Vienne / Lyon.</footer>
+  <footer class="site">GaroMoto - plateforme en phase de test, secteur Vienne / Lyon.</footer>
 </div>
 
 <!-- PUBLIC SEARCH (sans connexion) -->
@@ -268,9 +278,9 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       <tr><td>Box sécurisé Sud-Vienne</td><td>6,1 km</td><td>4.8 ★</td><td>55 €/mois</td><td><button class="btn small primary" onclick="openAuth('signup','client')">Réserver</button></td></tr>
       <tr><td>Hangar de Mathieu</td><td>9,8 km</td><td>4.6 ★</td><td>70 €/mois</td><td><button class="btn small primary" onclick="openAuth('signup','client')">Réserver</button></td></tr>
     </table>
-    <div class="notice">Tu dois créer un compte pour finaliser une réservation — c'est gratuit et ça prend deux minutes.</div>
+    <div class="notice">Tu dois créer un compte pour finaliser une réservation - c'est gratuit et ça prend deux minutes.</div>
   </div>
-  <footer class="site">GaroMoto — plateforme en phase de test, secteur Vienne / Lyon.</footer>
+  <footer class="site">GaroMoto - plateforme en phase de test, secteur Vienne / Lyon.</footer>
 </div>
 
 <!-- DASHBOARD CLIENT -->
@@ -287,15 +297,15 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <p class="sub">Places disponibles autour de ta zone.</p>
         <table style="margin-bottom:20px">
           <tr><th>Garage</th><th>Distance</th><th>Note</th><th>Tarif</th><th></th></tr>
-          <tr><td>Garage de Julien</td><td>2,4 km</td><td>4.8 ★</td><td>45 €/mois</td><td><button class="btn small primary" onclick="openBooking('Garage de Julien','Vienne — 2,4 km',45)">Réserver</button></td></tr>
-          <tr><td>Box sécurisé Sud-Vienne</td><td>6,1 km</td><td>4.8 ★</td><td>55 €/mois</td><td><button class="btn small primary" onclick="openBooking('Box sécurisé Sud-Vienne','Estrablin — 6,1 km',55)">Réserver</button></td></tr>
-          <tr><td>Hangar de Mathieu</td><td>9,8 km</td><td>4.6 ★</td><td>70 €/mois</td><td><button class="btn small primary" onclick="openBooking('Hangar de Mathieu','Chonas — 9,8 km',70)">Réserver</button></td></tr>
+          <tr><td>Garage de Julien</td><td>2,4 km</td><td>4.8 ★</td><td>45 €/mois</td><td><button class="btn small primary" onclick="openBooking('Garage de Julien','Vienne - 2,4 km',45)">Réserver</button></td></tr>
+          <tr><td>Box sécurisé Sud-Vienne</td><td>6,1 km</td><td>4.8 ★</td><td>55 €/mois</td><td><button class="btn small primary" onclick="openBooking('Box sécurisé Sud-Vienne','Estrablin - 6,1 km',55)">Réserver</button></td></tr>
+          <tr><td>Hangar de Mathieu</td><td>9,8 km</td><td>4.6 ★</td><td>70 €/mois</td><td><button class="btn small primary" onclick="openBooking('Hangar de Mathieu','Chonas - 9,8 km',70)">Réserver</button></td></tr>
         </table>
       </div>
 
       <div id="client-book" class="tabpanel">
-        <h1 id="book-title">Réserver — Garage de Julien</h1>
-        <p class="sub" id="book-loc">Vienne — 2,4 km</p>
+        <h1 id="book-title">Réserver - Garage de Julien</h1>
+        <p class="sub" id="book-loc">Vienne - 2,4 km</p>
         <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;margin-top:20px;align-items:start;">
           <div>
             <div class="field" data-req="true">
@@ -348,7 +358,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
           <div class="card" style="position:sticky; top:90px;">
             <h3 style="font-size:14px;margin-bottom:12px;">Résumé</h3>
             <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);">
-              <span>Place n° <span id="sum-slot">—</span>, <span id="sum-months">4,5</span> mois</span>
+              <span>Place n° <span id="sum-slot">-</span>, <span id="sum-months">4,5</span> mois</span>
               <span id="sum-base">202,50 €</span>
             </div>
             <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);" id="row-formule">
@@ -375,12 +385,12 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <div id="bookings-list">
           <div class="card">
             <div class="card-row">
-              <div><h3>Garage de Julien — place n°2</h3><div class="meta">03/11/2026 → 15/03/2027 · Yamaha XJ6</div></div>
+              <div><h3>Garage de Julien - place n°2</h3><div class="meta">03/11/2026 → 15/03/2027 · Yamaha XJ6</div></div>
               <span class="badge ok">Confirmée</span>
             </div>
           </div>
         </div>
-        <div class="notice">Rappel : ton retrait est prévu le 15/03/2027 — une notification te sera envoyée 5 jours avant.</div>
+        <div class="notice">Rappel : ton retrait est prévu le 15/03/2027 - une notification te sera envoyée 5 jours avant.</div>
       </div>
     </div>
   </div>
@@ -400,7 +410,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <p class="sub">Gère tes places disponibles.</p>
         <div class="card">
           <div class="card-row">
-            <div><h3>Garage de Julien</h3><div class="meta">Vienne (38) — 8 places</div></div>
+            <div><h3>Garage de Julien</h3><div class="meta">Vienne (38) - 8 places</div></div>
             <button class="btn small ghost">Modifier</button>
           </div>
           <div class="slots-editor">
@@ -409,7 +419,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             <div class="slot-tile booked">7</div><div class="slot-tile booked">8</div>
             <button class="add-slot" onclick="addSlot(this)">+</button>
           </div>
-          <p class="meta">5 places réservées sur 8 — clique sur + pour ouvrir une nouvelle place.</p>
+          <p class="meta">5 places réservées sur 8 - clique sur + pour ouvrir une nouvelle place.</p>
         </div>
         <button class="btn primary">Ajouter un garage</button>
       </div>
@@ -456,7 +466,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <div class="notice">3 propriétaires en attente de vérification d'identité.</div>
         <table>
           <tr><th>Événement</th><th>Utilisateur</th><th>Date</th><th>Statut</th></tr>
-          <tr><td>Nouvelle réservation — place n°2</td><td>T. Lambert</td><td>13 sept.</td><td><span class="badge ok">Confirmée</span></td></tr>
+          <tr><td>Nouvelle réservation - place n°2</td><td>T. Lambert</td><td>13 sept.</td><td><span class="badge ok">Confirmée</span></td></tr>
           <tr><td>Inscription propriétaire</td><td>M. Roussel</td><td>12 sept.</td><td><span class="badge pending">À vérifier</span></td></tr>
           <tr><td>Signalement état des lieux</td><td>J. Petit</td><td>10 sept.</td><td><span class="badge flag">Litige ouvert</span></td></tr>
         </table>
@@ -466,7 +476,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <table>
           <tr><th>Nom</th><th>Rôle</th><th>Identité</th><th>Note</th><th></th></tr>
           <tr><td>Julien Faure</td><td>Propriétaire</td><td><span class="badge ok">Vérifiée</span></td><td>4.8 ★</td><td><button class="btn small ghost">Voir</button></td></tr>
-          <tr><td>M. Roussel</td><td>Propriétaire</td><td><span class="badge pending">En attente</span></td><td>—</td><td><button class="btn small primary">Vérifier</button></td></tr>
+          <tr><td>M. Roussel</td><td>Propriétaire</td><td><span class="badge pending">En attente</span></td><td>-</td><td><button class="btn small primary">Vérifier</button></td></tr>
           <tr><td>T. Lambert</td><td>Client</td><td><span class="badge ok">Vérifiée</span></td><td>5.0 ★</td><td><button class="btn small ghost">Voir</button></td></tr>
         </table>
       </div>
@@ -482,7 +492,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <h1>Litiges</h1>
         <div class="card">
           <div class="card-row">
-            <div><h3>État des lieux contesté — place n°6</h3><div class="meta">J. Petit vs Mathieu Delvaux — ouvert le 10/09/2026</div></div>
+            <div><h3>État des lieux contesté - place n°6</h3><div class="meta">J. Petit vs Mathieu Delvaux - ouvert le 10/09/2026</div></div>
             <span class="badge flag">Ouvert</span>
           </div>
           <div style="margin-top:10px;display:flex;gap:8px;">
@@ -669,6 +679,22 @@ function addSlot(btn){
   btn.parentElement.insertBefore(tile, btn);
 }
 
+/* CARROUSEL D'AVIS */
+(function(){
+  let reviewIndex = 0;
+  function rotateReviews(){
+    const slides = document.querySelectorAll('.review-slide');
+    const dots = document.querySelectorAll('.rdot');
+    if(!slides.length) return;
+    slides[reviewIndex].classList.remove('active');
+    dots[reviewIndex].classList.remove('active');
+    reviewIndex = (reviewIndex + 1) % slides.length;
+    slides[reviewIndex].classList.add('active');
+    dots[reviewIndex].classList.add('active');
+  }
+  setInterval(rotateReviews, 4500);
+})();
+
 /* raccourci démo : accès admin via triple-clic sur le logo */
 let clickCount=0, clickTimer=null;
 document.querySelector('.logo').addEventListener('click', function(){
@@ -684,7 +710,7 @@ let bookingState = { garage:'', loc:'', baseRate:45, slot:null };
 function openBooking(garage, loc, rate){
   if(!window.currentRole){ openAuth('signup','client'); return; }
   bookingState = { garage, loc, baseRate:rate, slot:null };
-  document.getElementById('book-title').textContent = 'Réserver — ' + garage;
+  document.getElementById('book-title').textContent = 'Réserver - ' + garage;
   document.getElementById('book-loc').textContent = loc;
   document.querySelectorAll('#book-slots .slot-tile').forEach(t=>t.classList.remove('selected'));
   document.getElementById('book-slots').querySelectorAll('.slot-tile.free').forEach(t=>t.style.background='');
@@ -726,7 +752,7 @@ function recalcBooking(){
   const total = subtotal + fee;
 
   const fmt = n => n.toLocaleString('fr-FR', {minimumFractionDigits:2, maximumFractionDigits:2}) + ' €';
-  document.getElementById('sum-slot').textContent = bookingState.slot || '—';
+  document.getElementById('sum-slot').textContent = bookingState.slot || '-';
   document.getElementById('sum-months').textContent = months.toFixed(1).replace('.0','');
   document.getElementById('sum-base').textContent = fmt(base);
   document.getElementById('sum-formule').textContent = fmt(formuleTotal);
@@ -760,7 +786,7 @@ function confirmBooking(){
   const list = document.getElementById('bookings-list');
   const card = document.createElement('div');
   card.className = 'card';
-  card.innerHTML = '<div class="card-row"><div><h3>'+bookingState.garage+' — place n°'+bookingState.slot+'</h3>'
+  card.innerHTML = '<div class="card-row"><div><h3>'+bookingState.garage+' - place n°'+bookingState.slot+'</h3>'
     + '<div class="meta">'+fmtDate(dIn)+' → '+fmtDate(dOut)+' · '+moto+'</div></div>'
     + '<span class="badge pending">En attente de confirmation propriétaire</span></div>';
   list.prepend(card);
