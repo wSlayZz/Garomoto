@@ -79,6 +79,7 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .star-picker .star{color:var(--line-strong);cursor:pointer;transition:color .1s;}
 .star-picker .star.filled{color:#E8B84B;}
 .review-done{font-size:12.5px;color:var(--green);font-weight:500;}
+.cancel-btn{color:var(--orange-dark);border-color:var(--line-strong);}
 .welcome-toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--paper);padding:14px 22px;border-radius:8px;font-size:13.5px;box-shadow:0 8px 24px rgba(0,0,0,.18);opacity:0;transition:opacity .3s,transform .3s;z-index:200;max-width:90vw;text-align:center;}
 .welcome-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .modal-switch{font-size:13px;text-align:center;margin-top:16px;color:var(--metal);}
@@ -1569,6 +1570,14 @@ async function loadConversations(scope){
   }).join('');
 }
 
+async function cancelBooking(bookingId){
+  if(!confirm('Annuler cette demande de réservation ? Cette action est définitive.')) return;
+  const { error } = await sb.from('bookings').update({ status: 'cancelled' }).eq('id', bookingId);
+  if(error){ alert('Erreur : ' + error.message); return; }
+  showToast('Ta demande a été annulée.');
+  loadClientBookings();
+}
+
 /* AVIS CLIENT */
 let reviewState = { garageId:null, rating:0 };
 
@@ -2096,6 +2105,9 @@ async function loadClientBookings(){
         ? '<span class="review-done">✓ Avis envoyé</span>'
         : '<button class="btn small primary" onclick="openReviewModal(\''+garage.id+'\',\''+garageName.replace(/'/g,"\\'")+'\')">Laisser un avis</button>';
     }
+    const cancelAction = b.status === 'pending'
+      ? '<button class="btn small ghost cancel-btn" onclick="cancelBooking(\''+b.id+'\')">Annuler la demande</button>'
+      : '';
 
     return '<div class="card"><div class="card-row"><div>'
       + '<h3>'+garageName+' - place n°'+slotLabel+'</h3>'
@@ -2105,6 +2117,7 @@ async function loadClientBookings(){
       + '<button class="btn small ghost" onclick="openInspection(\''+b.id+'\')">État des lieux</button>'
       + '<button class="btn small ghost" onclick="openMessages(\''+b.id+'\')">Messages</button>'
       + reviewAction
+      + cancelAction
       + '</div></div>';
   }).join('');
 }
