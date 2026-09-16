@@ -120,6 +120,8 @@ header.nav{display:flex;justify-content:space-between;align-items:center;padding
 .side-item.active{background:var(--ink);color:var(--paper);font-weight:500;}
 .side-label{font-size:11px;color:var(--metal);text-transform:uppercase;letter-spacing:.03em;padding:0 14px;margin:14px 0 8px;}
 .main{padding:28px 32px;}
+.tabpanel{display:none;}
+.tabpanel.active{display:block;}
 .main h1{font-size:22px;margin-bottom:4px;}
 .main .sub{font-size:13.5px;color:var(--metal);margin-bottom:24px;}
 .sub{font-size:13.5px;color:var(--metal);}
@@ -157,6 +159,33 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 
 .notice{background:#FBF3E4;border:1px solid #EEDCB6;border-radius:8px;padding:12px 16px;font-size:13px;color:#7A5A1E;margin-bottom:20px;}
 .empty-state{text-align:center;padding:52px 24px;border:1px dashed var(--line-strong);border-radius:10px;}
+.empty-state .icon{width:44px;height:44px;border-radius:10px;background:var(--paper);color:var(--metal);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+.empty-state h3{font-size:15px;margin-bottom:6px;}
+.empty-state p{font-size:13.5px;color:var(--metal);margin:0 0 18px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;}
+
+/* SEARCH ENGINE */
+.search-panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px 20px 6px;}
+.search-row{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap;}
+.opt-chip{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--metal-dark);border:1px solid var(--line-strong);border-radius:20px;padding:6px 12px;cursor:pointer;background:#fff;}
+.opt-chip input{width:auto;}
+.result-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:border-color .12s;}
+.result-card:hover{border-color:var(--line-strong);}
+.result-main{display:flex;gap:14px;align-items:flex-start;flex:1;}
+.result-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#DCE3EE,#C9D3E4);flex-shrink:0;}
+.result-info h3{font-size:15px;margin-bottom:3px;}
+.result-info .meta{font-size:12.5px;color:var(--metal);margin-bottom:6px;}
+.result-tags{display:flex;gap:6px;flex-wrap:wrap;}
+.tag{font-size:10.5px;background:var(--paper);color:var(--metal-dark);padding:3px 8px;border-radius:12px;}
+.result-side{display:flex;flex-direction:column;align-items:flex-end;gap:8px;}
+.result-price{font-family:'Roboto Slab',serif;font-size:18px;font-weight:700;}
+.result-price span{font-size:11px;font-weight:400;color:var(--metal);font-family:'Inter',sans-serif;}
+.compare-check{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--metal);}
+.compare-check input{width:auto;}
+.options-tags{display:flex;flex-wrap:wrap;gap:8px;}
+.options-tags .tag{background:var(--paper);color:var(--metal-dark);font-size:12px;padding:5px 11px;}
+.booking-header{display:flex;justify-content:space-between;align-items:flex-start;}
+.booking-rating{font-size:13px;color:var(--metal-dark);background:var(--paper);padding:6px 12px;border-radius:8px;white-space:nowrap;}
+.sum-row{font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);}
 .empty-state .icon{width:44px;height:44px;border-radius:10px;background:var(--paper);color:var(--metal);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
 .empty-state h3{font-size:15px;margin-bottom:6px;}
 .empty-state p{font-size:13.5px;color:var(--metal);margin:0 0 18px;max-width:320px;margin-left:auto;margin-right:auto;line-height:1.5;}
@@ -288,37 +317,102 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
   <div class="shell">
     <div class="sidebar">
       <div class="side-item active" data-tab="client-search" onclick="setSideTab(this,'client')">Trouver une place</div>
-      <div class="side-item" data-tab="client-book" onclick="setSideTab(this,'client')" style="display:none">Réservation</div>
       <div class="side-item" data-tab="client-bookings" onclick="setSideTab(this,'client')">Mes réservations</div>
     </div>
     <div class="main">
+
+      <!-- RECHERCHE -->
       <div id="client-search" class="tabpanel active">
         <h1>Trouver une place</h1>
-        <p class="sub">Places disponibles autour de ta zone.</p>
-        <table style="margin-bottom:20px">
-          <tr><th>Garage</th><th>Distance</th><th>Note</th><th>Tarif</th><th></th></tr>
-          <tr><td>Garage de Julien</td><td>2,4 km</td><td>4.8 ★</td><td>45 €/mois</td><td><button class="btn small primary" onclick="openBooking('Garage de Julien','Vienne - 2,4 km',45)">Réserver</button></td></tr>
-          <tr><td>Box sécurisé Sud-Vienne</td><td>6,1 km</td><td>4.8 ★</td><td>55 €/mois</td><td><button class="btn small primary" onclick="openBooking('Box sécurisé Sud-Vienne','Estrablin - 6,1 km',55)">Réserver</button></td></tr>
-          <tr><td>Hangar de Mathieu</td><td>9,8 km</td><td>4.6 ★</td><td>70 €/mois</td><td><button class="btn small primary" onclick="openBooking('Hangar de Mathieu','Chonas - 9,8 km',70)">Réserver</button></td></tr>
-        </table>
+        <p class="sub">Filtre par zone, budget et options pour trouver la place qui te convient.</p>
+
+        <div class="search-panel">
+          <div class="search-row">
+            <div class="field" style="flex:2;margin-bottom:0;">
+              <label>Ville, code postal ou adresse</label>
+              <div style="display:flex;gap:8px;">
+                <input type="text" id="s-location" value="Vienne, 38200" oninput="runSearch()">
+                <button class="btn ghost small" onclick="useMyLocation()" title="Utiliser ma position actuelle">📍 Ma position</button>
+              </div>
+            </div>
+            <div class="field" style="flex:1;margin-bottom:0;">
+              <label>Rayon</label>
+              <select id="s-radius" onchange="runSearch()">
+                <option value="5">5 km</option>
+                <option value="10" selected>10 km</option>
+                <option value="25">25 km</option>
+                <option value="1000">Toute distance</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="search-row">
+            <div class="field" style="margin-bottom:0;">
+              <label>Budget max / mois</label>
+              <select id="s-budget" onchange="runSearch()">
+                <option value="1000">Peu importe</option>
+                <option value="40">Moins de 40 €</option>
+                <option value="60">Moins de 60 €</option>
+                <option value="80">Moins de 80 €</option>
+              </select>
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Dépôt</label>
+              <input type="date" id="s-date-in" value="2026-11-03" onchange="runSearch()">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Retrait</label>
+              <input type="date" id="s-date-out" value="2027-03-15" onchange="runSearch()">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label>Trier par</label>
+              <select id="s-sort" onchange="runSearch()">
+                <option value="distance">Distance</option>
+                <option value="price">Prix croissant</option>
+                <option value="rating">Note</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="search-row" style="margin-bottom:0;">
+            <label class="opt-chip"><input type="checkbox" class="s-opt" value="assurance" onchange="runSearch()"> Assurance incluse</label>
+            <label class="opt-chip"><input type="checkbox" class="s-opt" value="prepa" onchange="runSearch()"> Préparation hivernage</label>
+            <label class="opt-chip"><input type="checkbox" class="s-opt" value="video" onchange="runSearch()"> Vidéosurveillance</label>
+            <label class="opt-chip"><input type="checkbox" class="s-opt" value="acces24" onchange="runSearch()"> Accès 24/7</label>
+            <label class="opt-chip"><input type="checkbox" class="s-opt" value="transport" onchange="runSearch()"> Transport dépôt/retrait</label>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 12px;">
+          <p class="sub" id="results-count" style="margin:0;">3 places trouvées</p>
+          <span class="nav-link" id="compare-toggle" style="display:none" onclick="toggleCompare()">Comparer (<span id="compare-n">0</span>)</span>
+        </div>
+
+        <div id="results-list"></div>
+        <div id="compare-panel" style="display:none;margin-top:20px;"></div>
       </div>
 
+      <!-- RESERVATION (ouverte depuis la recherche, pas dans la sidebar) -->
       <div id="client-book" class="tabpanel">
-        <h1 id="book-title">Réserver - Garage de Julien</h1>
-        <p class="sub" id="book-loc">Vienne - 2,4 km</p>
-        <div style="display:grid;grid-template-columns:1fr 300px;gap:24px;margin-top:20px;align-items:start;">
+        <span class="nav-link" style="padding-left:0;margin-bottom:10px;display:inline-block;" onclick="backToSearch()">← Retour à la recherche</span>
+        <div class="booking-header">
           <div>
+            <h1 id="book-title">Réserver - Garage de Julien</h1>
+            <p class="sub" id="book-loc">Vienne - 2,4 km</p>
+          </div>
+          <div class="booking-rating" id="book-rating">4.8 ★ (12 avis)</div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 320px;gap:28px;margin-top:22px;align-items:start;">
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <h3 style="font-size:14px;margin-bottom:10px;">Options proposées par ce garage</h3>
+              <div id="book-options-list" class="options-tags"></div>
+            </div>
+
             <div class="field" data-req="true">
               <label>Choisir une place</label>
-              <div class="slots-editor" id="book-slots">
-                <div class="slot-tile booked">1</div>
-                <div class="slot-tile free" onclick="pickSlot(this)">2</div>
-                <div class="slot-tile booked">4</div>
-                <div class="slot-tile free" onclick="pickSlot(this)">5</div>
-                <div class="slot-tile booked">6</div>
-                <div class="slot-tile free" onclick="pickSlot(this)">7</div>
-                <div class="slot-tile free" onclick="pickSlot(this)">8</div>
-              </div>
+              <div class="slots-editor" id="book-slots"></div>
               <div class="field-error" id="err-slot">Choisis une place libre.</div>
             </div>
             <div style="display:flex;gap:12px;">
@@ -356,25 +450,26 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
           </div>
 
           <div class="card" style="position:sticky; top:90px;">
-            <h3 style="font-size:14px;margin-bottom:12px;">Résumé</h3>
-            <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);">
+            <h3 style="font-size:14px;margin-bottom:12px;">Résumé de la réservation</h3>
+            <div class="sum-row">
               <span>Place n° <span id="sum-slot">-</span>, <span id="sum-months">4,5</span> mois</span>
               <span id="sum-base">202,50 €</span>
             </div>
-            <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);" id="row-formule">
+            <div class="sum-row" id="row-formule">
               <span>Formule</span><span id="sum-formule">0 €</span>
             </div>
-            <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);" id="row-insurance">
+            <div class="sum-row" id="row-insurance">
               <span>Assurance</span><span id="sum-insurance">0 €</span>
             </div>
-            <div style="font-size:13px;color:var(--metal);display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--line);">
+            <div class="sum-row">
               <span>Frais de service (8%)</span><span id="sum-fee">16,20 €</span>
             </div>
-            <div style="font-size:15px;font-weight:500;display:flex;justify-content:space-between;padding:10px 0 0;">
+            <div style="font-size:16px;font-weight:600;display:flex;justify-content:space-between;padding:12px 0 0;">
               <span>Total</span><span id="sum-total">218,70 €</span>
             </div>
             <button class="btn primary block" style="margin-top:14px;" onclick="confirmBooking()">Confirmer la réservation</button>
             <div class="field-error" id="err-general" style="text-align:center;margin-top:8px;">Choisis une place et complète les champs requis.</div>
+            <p style="font-size:11.5px;color:var(--metal);margin-top:12px;margin-bottom:0;text-align:center;">Aucun débit avant confirmation du propriétaire.</p>
           </div>
         </div>
       </div>
@@ -397,6 +492,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
 </div>
 
 <!-- DASHBOARD OWNER -->
+
 <div id="view-owner" class="view">
   <div class="shell">
     <div class="sidebar">
@@ -407,39 +503,83 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
     <div class="main">
       <div id="owner-garages" class="tabpanel active">
         <h1>Mes garages</h1>
-        <p class="sub">Gère tes places disponibles.</p>
+        <p class="sub">Gère tes places disponibles et les options que tu proposes.</p>
+
         <div class="card">
           <div class="card-row">
-            <div><h3>Garage de Julien</h3><div class="meta">Vienne (38) - 8 places</div></div>
-            <button class="btn small ghost">Modifier</button>
+            <div><h3>Garage de Julien</h3><div class="meta">Vienne (38) - 8 places - 45 €/mois</div></div>
+            <button class="btn small ghost">Modifier le tarif</button>
           </div>
+
+          <p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>
           <div class="slots-editor">
             <div class="slot-tile booked">1</div><div class="slot-tile free">2</div><div class="slot-tile free">3</div>
             <div class="slot-tile booked">4</div><div class="slot-tile free">5</div><div class="slot-tile booked">6</div>
             <div class="slot-tile booked">7</div><div class="slot-tile booked">8</div>
             <button class="add-slot" onclick="addSlot(this)">+</button>
           </div>
-          <p class="meta">5 places réservées sur 8 - clique sur + pour ouvrir une nouvelle place.</p>
+          <p class="meta" style="margin-bottom:16px;">5 places réservées sur 8 - clique sur + pour ouvrir une nouvelle place.</p>
+
+          <p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>
+          <div class="search-row" style="margin-bottom:0;">
+            <label class="opt-chip"><input type="checkbox" checked> Vidéosurveillance</label>
+            <label class="opt-chip"><input type="checkbox" checked> Préparation hivernage</label>
+            <label class="opt-chip"><input type="checkbox"> Assurance incluse</label>
+            <label class="opt-chip"><input type="checkbox"> Accès 24/7</label>
+            <label class="opt-chip"><input type="checkbox"> Transport dépôt/retrait</label>
+          </div>
         </div>
+
+        <div class="card">
+          <div class="card-row">
+            <div><h3>Box sécurisé Sud-Vienne</h3><div class="meta">Estrablin (38) - 4 places - 55 €/mois</div></div>
+            <button class="btn small ghost">Modifier le tarif</button>
+          </div>
+          <p style="font-size:12.5px;color:var(--metal);margin:14px 0 6px;font-weight:500;">Places</p>
+          <div class="slots-editor">
+            <div class="slot-tile booked">1</div><div class="slot-tile booked">2</div><div class="slot-tile booked">3</div><div class="slot-tile free">4</div>
+            <button class="add-slot" onclick="addSlot(this)">+</button>
+          </div>
+          <p class="meta" style="margin-bottom:16px;">3 places réservées sur 4.</p>
+          <p style="font-size:12.5px;color:var(--metal);margin:0 0 8px;font-weight:500;">Options proposées</p>
+          <div class="search-row" style="margin-bottom:0;">
+            <label class="opt-chip"><input type="checkbox" checked> Assurance incluse</label>
+            <label class="opt-chip"><input type="checkbox" checked> Vidéosurveillance</label>
+            <label class="opt-chip"><input type="checkbox" checked> Accès 24/7</label>
+            <label class="opt-chip"><input type="checkbox"> Préparation hivernage</label>
+            <label class="opt-chip"><input type="checkbox"> Transport dépôt/retrait</label>
+          </div>
+        </div>
+
         <button class="btn primary">Ajouter un garage</button>
       </div>
+
       <div id="owner-bookings" class="tabpanel">
         <h1>Réservations</h1>
+        <p class="sub">Suivi des demandes et séjours en cours sur tes garages.</p>
         <table>
-          <tr><th>Client</th><th>Place</th><th>Moto</th><th>Période</th><th>Statut</th></tr>
-          <tr><td>T. Lambert</td><td>n°2</td><td>Yamaha XJ6</td><td>03/11 → 15/03</td><td><span class="badge ok">Confirmée</span></td></tr>
-          <tr><td>C. Nguyen</td><td>n°1</td><td>Honda CB500</td><td>01/11 → 28/02</td><td><span class="badge ok">En cours</span></td></tr>
-          <tr><td>S. Morel</td><td>n°4</td><td>Kawasaki Z650</td><td>10/11 → 20/03</td><td><span class="badge pending">Dépôt à venir</span></td></tr>
+          <tr><th>Client</th><th>Garage</th><th>Place</th><th>Moto</th><th>Période</th><th>Statut</th><th></th></tr>
+          <tr><td>T. Lambert</td><td>Garage de Julien</td><td>n°2</td><td>Yamaha XJ6</td><td>03/11 → 15/03</td><td><span class="badge ok">Confirmée</span></td><td><button class="btn small ghost">État des lieux</button></td></tr>
+          <tr><td>C. Nguyen</td><td>Garage de Julien</td><td>n°1</td><td>Honda CB500</td><td>01/11 → 28/02</td><td><span class="badge ok">En cours</span></td><td><button class="btn small ghost">État des lieux</button></td></tr>
+          <tr><td>S. Morel</td><td>Box sécurisé Sud-Vienne</td><td>n°4</td><td>Kawasaki Z650</td><td>10/11 → 20/03</td><td><span class="badge pending">Dépôt à venir</span></td><td><button class="btn small primary">Confirmer</button></td></tr>
         </table>
       </div>
+
       <div id="owner-revenue" class="tabpanel">
         <h1>Revenus</h1>
+        <p class="sub">Vue d'ensemble de tes gains sur l'ensemble de tes garages.</p>
         <div class="metric-grid">
           <div class="metric"><div class="lbl">Revenu réalisé</div><div class="val">890 €</div><div class="subv">depuis le 1er nov.</div></div>
           <div class="metric"><div class="lbl">Prévisionnel saison</div><div class="val">1 640 €</div><div class="subv">estimation fin de saison</div></div>
           <div class="metric"><div class="lbl">Occupation</div><div class="val">67%</div><div class="subv">12 places / 18</div></div>
           <div class="metric"><div class="lbl">Note moyenne</div><div class="val">4.8 ★</div><div class="subv">12 avis</div></div>
         </div>
+        <table>
+          <tr><th>Mois</th><th>Réservations actives</th><th>Revenu brut</th><th>Commission GaroMoto (8%)</th><th>Net</th></tr>
+          <tr><td>Novembre</td><td>10</td><td>450 €</td><td>36 €</td><td>414 €</td></tr>
+          <tr><td>Décembre (prév.)</td><td>12</td><td>540 €</td><td>43 €</td><td>497 €</td></tr>
+          <tr><td>Janvier (prév.)</td><td>12</td><td>540 €</td><td>43 €</td><td>497 €</td></tr>
+        </table>
       </div>
     </div>
   </div>
@@ -633,8 +773,18 @@ function loginAs(name, role){
   const roleLabels = {client:'Compte client', owner:'Compte propriétaire', admin:'Compte admin'};
   document.getElementById('dropdown-role').textContent = roleLabels[role] || 'Compte';
   window.currentRole = role;
+  try { localStorage.setItem('garomoto_session', JSON.stringify({name, role})); } catch(e){}
   closeAuth();
   goDashboard();
+}
+
+function tryAutoLogin(){
+  try {
+    const raw = localStorage.getItem('garomoto_session');
+    if(!raw) return;
+    const session = JSON.parse(raw);
+    if(session && session.name && session.role) loginAs(session.name, session.role);
+  } catch(e){}
 }
 
 function goLanding(){
@@ -652,12 +802,16 @@ function goDashboard(){
   const role = window.currentRole || 'client';
   document.getElementById('view-'+role).classList.add('active');
   closeDropdown();
+  if(role === 'client') runSearch();
 }
 function logout(){
   document.getElementById('nav-logged-out').style.display='flex';
   document.getElementById('nav-logged-in').style.display='none';
+  try { localStorage.removeItem('garomoto_session'); } catch(e){}
   goLanding();
 }
+document.addEventListener('DOMContentLoaded', tryAutoLogin);
+if(document.readyState === 'complete' || document.readyState === 'interactive') tryAutoLogin();
 function toggleDropdown(){ document.getElementById('dropdown').classList.toggle('open'); }
 function closeDropdown(){ document.getElementById('dropdown').classList.remove('open'); }
 document.addEventListener('click', function(e){
@@ -677,6 +831,99 @@ function addSlot(btn){
   tile.className = 'slot-tile free';
   tile.textContent = n;
   btn.parentElement.insertBefore(tile, btn);
+}
+
+/* MOTEUR DE RECHERCHE CLIENT */
+const OPTION_LABELS = {
+  assurance: 'Assurance incluse', prepa: 'Préparation hivernage',
+  video: 'Vidéosurveillance', acces24: 'Accès 24/7', transport: 'Transport dépôt/retrait'
+};
+const GARAGES = [
+  { id:'julien', name:'Garage de Julien', loc:'Vienne (38)', distance:2.4, rating:4.8, reviews:12, price:45,
+    options:['video','prepa'], freeSlots:['2','5','7','8'], bookedSlots:['1','4','6'] },
+  { id:'sudvienne', name:'Box sécurisé Sud-Vienne', loc:'Estrablin (38)', distance:6.1, rating:4.8, reviews:9, price:55,
+    options:['assurance','video','acces24'], freeSlots:['4'], bookedSlots:['1','2','3'] },
+  { id:'mathieu', name:'Hangar de Mathieu', loc:'Chonas (38)', distance:9.8, rating:4.6, reviews:15, price:70,
+    options:['prepa','transport','assurance'], freeSlots:['3','5','9','10'], bookedSlots:['1','2','4','6','7','8'] },
+];
+let compareIds = [];
+
+function useMyLocation(){
+  const input = document.getElementById('s-location');
+  if(!navigator.geolocation){ input.value = 'Position indisponible'; return; }
+  input.value = 'Localisation en cours...';
+  navigator.geolocation.getCurrentPosition(
+    function(pos){ input.value = 'Ma position actuelle'; runSearch(); },
+    function(){ input.value = 'Vienne, 38200'; runSearch(); }
+  );
+}
+
+function runSearch(){
+  const radius = parseFloat(document.getElementById('s-radius').value);
+  const budget = parseFloat(document.getElementById('s-budget').value);
+  const sort = document.getElementById('s-sort').value;
+  const activeOpts = [...document.querySelectorAll('.s-opt:checked')].map(c=>c.value);
+
+  let list = GARAGES.filter(g => g.distance <= radius && g.price <= budget);
+  if(activeOpts.length){
+    list = list.filter(g => activeOpts.every(o => g.options.includes(o)));
+  }
+  if(sort === 'distance') list.sort((a,b)=>a.distance-b.distance);
+  if(sort === 'price') list.sort((a,b)=>a.price-b.price);
+  if(sort === 'rating') list.sort((a,b)=>b.rating-a.rating);
+
+  document.getElementById('results-count').textContent = list.length + (list.length>1 ? ' places trouvées' : ' place trouvée');
+  const container = document.getElementById('results-list');
+
+  if(!list.length){
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Aucune place ne correspond</h3><p>Essaie d\'élargir le rayon de recherche ou de retirer un filtre d\'options.</p></div>';
+    return;
+  }
+
+  container.innerHTML = list.map(g => {
+    const tags = g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('');
+    const checked = compareIds.includes(g.id) ? 'checked' : '';
+    return '<div class="result-card">'
+      + '<div class="result-main"><div class="result-thumb"></div>'
+      + '<div class="result-info"><h3>'+g.name+'</h3>'
+      + '<div class="meta">'+g.loc+' - '+g.distance.toFixed(1).replace('.0','')+' km - '+g.rating+' ★ ('+g.reviews+' avis)</div>'
+      + '<div class="result-tags">'+tags+'</div></div></div>'
+      + '<div class="result-side">'
+      + '<div class="result-price">'+g.price+' € <span>/mois</span></div>'
+      + '<button class="btn small primary" onclick="openBooking(\'' + g.id + '\')">Réserver</button>'
+      + '<label class="compare-check"><input type="checkbox" '+checked+' onchange="toggleCompareId(\'' + g.id + '\',this.checked)"> Comparer</label>'
+      + '</div></div>';
+  }).join('');
+}
+
+function toggleCompareId(id, checked){
+  if(checked){ if(!compareIds.includes(id) && compareIds.length<3) compareIds.push(id); }
+  else { compareIds = compareIds.filter(i=>i!==id); }
+  document.getElementById('compare-toggle').style.display = compareIds.length>=2 ? 'inline' : 'none';
+  document.getElementById('compare-n').textContent = compareIds.length;
+  if(compareIds.length<2) document.getElementById('compare-panel').style.display='none';
+}
+
+function toggleCompare(){
+  const panel = document.getElementById('compare-panel');
+  const open = panel.style.display === 'block';
+  if(open){ panel.style.display='none'; return; }
+  const list = GARAGES.filter(g => compareIds.includes(g.id));
+  const allOpts = Object.keys(OPTION_LABELS);
+  let rows = '<tr><th>Critère</th>' + list.map(g=>'<th>'+g.name+'</th>').join('') + '</tr>';
+  rows += '<tr><td>Distance</td>' + list.map(g=>'<td>'+g.distance+' km</td>').join('') + '</tr>';
+  rows += '<tr><td>Tarif</td>' + list.map(g=>'<td>'+g.price+' €/mois</td>').join('') + '</tr>';
+  rows += '<tr><td>Note</td>' + list.map(g=>'<td>'+g.rating+' ★ ('+g.reviews+')</td>').join('') + '</tr>';
+  allOpts.forEach(o => {
+    rows += '<tr><td>'+OPTION_LABELS[o]+'</td>' + list.map(g=>'<td>'+(g.options.includes(o)?'Oui':'-')+'</td>').join('') + '</tr>';
+  });
+  panel.innerHTML = '<h3 style="font-size:15px;margin-bottom:12px;">Comparatif</h3><table>'+rows+'</table>';
+  panel.style.display = 'block';
+}
+
+function backToSearch(){
+  document.querySelectorAll('#view-client .tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('client-search').classList.add('active');
 }
 
 /* CARROUSEL D'AVIS */
@@ -707,17 +954,26 @@ document.querySelector('.logo').addEventListener('click', function(){
 /* RESERVATION */
 let bookingState = { garage:'', loc:'', baseRate:45, slot:null };
 
-function openBooking(garage, loc, rate){
+function openBooking(garageId){
   if(!window.currentRole){ openAuth('signup','client'); return; }
-  bookingState = { garage, loc, baseRate:rate, slot:null };
-  document.getElementById('book-title').textContent = 'Réserver - ' + garage;
-  document.getElementById('book-loc').textContent = loc;
-  document.querySelectorAll('#book-slots .slot-tile').forEach(t=>t.classList.remove('selected'));
-  document.getElementById('book-slots').querySelectorAll('.slot-tile.free').forEach(t=>t.style.background='');
-  document.getElementById('client-book').closest('.shell').querySelectorAll('.side-item').forEach(s=>s.classList.remove('active'));
-  const bookTab = document.querySelector('[data-tab="client-book"]');
-  bookTab.style.display = 'block';
-  setSideTab(bookTab, 'client');
+  const g = GARAGES.find(x => x.id === garageId);
+  if(!g) return;
+  bookingState = { garage:g.name, loc:g.loc + ' - ' + g.distance + ' km', baseRate:g.price, slot:null };
+
+  document.getElementById('book-title').textContent = 'Réserver - ' + g.name;
+  document.getElementById('book-loc').textContent = bookingState.loc;
+  document.getElementById('book-rating').textContent = g.rating + ' ★ (' + g.reviews + ' avis)';
+
+  document.getElementById('book-options-list').innerHTML = g.options.length
+    ? g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('')
+    : '<span class="tag">Stockage simple, sans option supplémentaire</span>';
+
+  const slotsHtml = g.freeSlots.map(n => '<div class="slot-tile free" onclick="pickSlot(this)">'+n+'</div>').join('')
+    + g.bookedSlots.map(n => '<div class="slot-tile booked">'+n+'</div>').join('');
+  document.getElementById('book-slots').innerHTML = slotsHtml;
+
+  document.getElementById('client-book').closest('.main').querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('client-book').classList.add('active');
   recalcBooking();
 }
 
@@ -791,9 +1047,10 @@ function confirmBooking(){
     + '<span class="badge pending">En attente de confirmation propriétaire</span></div>';
   list.prepend(card);
 
-  const bookTab = document.querySelector('[data-tab="client-book"]');
-  bookTab.style.display = 'none';
-  setSideTab(document.querySelector('[data-tab="client-bookings"]'), 'client');
+  document.querySelectorAll('#view-client .side-item').forEach(s=>s.classList.remove('active'));
+  document.querySelector('[data-tab="client-bookings"]').classList.add('active');
+  document.querySelectorAll('#view-client .tabpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('client-bookings').classList.add('active');
 }
 </script>
 </body>
