@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>GaroMoto</title>
@@ -171,7 +173,16 @@ tbody tr:hover, table tr:hover{background:var(--paper);}
 .result-card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;gap:16px;transition:border-color .12s;}
 .result-card:hover{border-color:var(--line-strong);}
 .result-main{display:flex;gap:14px;align-items:flex-start;flex:1;}
-.result-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#DCE3EE,#C9D3E4);flex-shrink:0;}
+.result-thumb{width:56px;height:56px;border-radius:8px;background:linear-gradient(135deg,#DCE3EE,#C9D3E4);background-size:cover;background-position:center;flex-shrink:0;}
+.view-toggle{display:flex;border:1px solid var(--line-strong);border-radius:8px;padding:3px;}
+.view-toggle-btn{border:none;background:transparent;padding:6px 14px;font-size:12.5px;border-radius:6px;cursor:pointer;color:var(--metal-dark);font-family:inherit;}
+.view-toggle-btn.active{background:var(--ink);color:var(--paper);}
+.map-popup h4{font-size:13px;margin:0 0 4px;}
+.map-popup p{font-size:12px;margin:0 0 6px;color:var(--metal-dark);}
+.msg-bubble{max-width:80%;padding:9px 13px;border-radius:12px;font-size:13.5px;line-height:1.4;}
+.msg-bubble.mine{align-self:flex-end;background:var(--orange);color:#fff;}
+.msg-bubble.theirs{align-self:flex-start;background:var(--paper);color:var(--ink);}
+.msg-time{font-size:10.5px;color:var(--metal);margin-top:2px;}
 .result-info h3{font-size:15px;margin-bottom:3px;}
 .result-info .meta{font-size:12.5px;color:var(--metal);margin-bottom:6px;}
 .result-tags{display:flex;gap:6px;flex-wrap:wrap;}
@@ -218,6 +229,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       <div class="dropdown" id="dropdown">
         <div class="role-tag" id="dropdown-role">Compte client</div>
         <div class="dropdown-item" onclick="goDashboard()">Mon espace</div>
+        <div class="dropdown-item" onclick="openIdentityModal()">Vérification d'identité</div>
         <div class="dropdown-item" onclick="closeDropdown()">Paramètres</div>
         <div class="dropdown-item danger" onclick="logout()">Se déconnecter</div>
       </div>
@@ -371,10 +383,17 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
 
         <div style="display:flex;justify-content:space-between;align-items:center;margin:20px 0 12px;">
           <p class="sub" id="results-count" style="margin:0;">3 places trouvées</p>
-          <span class="nav-link" id="compare-toggle" style="display:none" onclick="toggleCompare()">Comparer (<span id="compare-n">0</span>)</span>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <span class="nav-link" id="compare-toggle" style="display:none" onclick="toggleCompare()">Comparer (<span id="compare-n">0</span>)</span>
+            <div class="view-toggle">
+              <button class="view-toggle-btn active" id="view-btn-list" onclick="setResultsView('list')">Liste</button>
+              <button class="view-toggle-btn" id="view-btn-map" onclick="setResultsView('map')">Carte</button>
+            </div>
+          </div>
         </div>
 
         <div id="results-list"></div>
+        <div id="results-map" style="display:none;height:420px;border-radius:10px;overflow:hidden;border:1px solid var(--line);margin-bottom:16px;"></div>
         <div id="compare-panel" style="display:none;margin-top:20px;"></div>
       </div>
 
@@ -497,6 +516,10 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
             <div class="field" style="flex:1;margin-bottom:0;"><label>Tarif mensuel (€)</label><input type="number" id="ng-price" placeholder="45"></div>
             <div class="field" style="flex:1;margin-bottom:0;"><label>Nombre de places initiales</label><input type="number" id="ng-slots" placeholder="4"></div>
           </div>
+          <div class="field" style="margin-bottom:0;">
+            <label>Photo du garage</label>
+            <input type="file" id="ng-photo" accept="image/*">
+          </div>
           <div style="display:flex;gap:8px;margin-top:6px;">
             <button class="btn primary small" onclick="createGarage()">Créer le garage</button>
             <button class="btn ghost small" onclick="document.getElementById('add-garage-form').style.display='none'">Annuler</button>
@@ -535,6 +558,7 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
       <div class="side-item" data-tab="admin-users" onclick="setSideTab(this,'admin'); loadAdminUsers();">Comptes</div>
       <div class="side-item" data-tab="admin-listings" onclick="setSideTab(this,'admin'); loadAdminListings();">Garages</div>
       <div class="side-item" data-tab="admin-disputes" onclick="setSideTab(this,'admin'); loadAdminDisputes();">Litiges</div>
+      <div class="side-item" data-tab="admin-verifications" onclick="setSideTab(this,'admin'); loadAdminVerifications();">Vérifications</div>
     </div>
     <div class="main">
       <div id="admin-overview" class="tabpanel active">
@@ -568,6 +592,60 @@ footer.site{padding:26px 32px;font-size:12px;color:var(--metal);border-top:1px s
         <p class="sub">Réservations signalées, identifiées par garage et place - jamais par identité client.</p>
         <div id="admin-disputes-list"><p class="sub">Chargement...</p></div>
       </div>
+      <div id="admin-verifications" class="tabpanel">
+        <h1>Vérifications d'identité</h1>
+        <p class="sub">Documents en attente de validation.</p>
+        <div id="admin-verifications-list"><p class="sub">Chargement...</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ETAT DES LIEUX MODAL -->
+<div class="overlay" id="inspection-overlay">
+  <div class="modal" style="max-width:520px;">
+    <button class="modal-close" onclick="document.getElementById('inspection-overlay').classList.remove('open')">✕</button>
+    <h2 style="font-size:18px;">État des lieux</h2>
+    <p class="sub" style="margin-bottom:16px;">Photos horodatées, à l'arrivée et au départ.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div>
+        <p style="font-size:12.5px;font-weight:500;margin-bottom:8px;">Dépôt</p>
+        <div id="inspection-checkin"></div>
+        <input type="file" accept="image/*" id="inspection-file-checkin" style="margin-top:8px;font-size:12px;">
+        <button class="btn small ghost" style="margin-top:6px;" onclick="uploadInspection('checkin')">Ajouter une photo</button>
+      </div>
+      <div>
+        <p style="font-size:12.5px;font-weight:500;margin-bottom:8px;">Retrait</p>
+        <div id="inspection-checkout"></div>
+        <input type="file" accept="image/*" id="inspection-file-checkout" style="margin-top:8px;font-size:12px;">
+        <button class="btn small ghost" style="margin-top:6px;" onclick="uploadInspection('checkout')">Ajouter une photo</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VERIFICATION IDENTITE MODAL -->
+<div class="overlay" id="identity-overlay">
+  <div class="modal" style="max-width:420px;">
+    <button class="modal-close" onclick="document.getElementById('identity-overlay').classList.remove('open')">✕</button>
+    <h2 style="font-size:18px;">Vérification d'identité</h2>
+    <p class="sub" style="margin-bottom:16px;">Un badge "Identité vérifiée" s'affiche sur ton profil une fois validé par un administrateur. Le document n'est jamais visible publiquement.</p>
+    <div id="identity-status"></div>
+    <input type="file" accept="image/*,.pdf" id="identity-file" style="margin:12px 0;font-size:13px;">
+    <button class="btn primary block" onclick="uploadIdentityDocument()">Envoyer le document</button>
+  </div>
+</div>
+
+<!-- MESSAGERIE MODAL -->
+<div class="overlay" id="messages-overlay">
+  <div class="modal" style="max-width:480px;">
+    <button class="modal-close" onclick="closeMessages()">✕</button>
+    <h2 style="font-size:18px;">Messages</h2>
+    <p class="sub" style="margin-bottom:16px;">Échange sans partager tes coordonnées personnelles.</p>
+    <div id="messages-thread" style="max-height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="message-input" placeholder="Écrire un message..." style="flex:1;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;font-family:inherit;font-size:14px;">
+      <button class="btn primary small" onclick="sendMessage()">Envoyer</button>
     </div>
   </div>
 </div>
@@ -802,7 +880,7 @@ async function fetchGarages(){
   container.innerHTML = '<p class="sub">Chargement des places disponibles...</p>';
   const { data, error } = await sb
     .from('garages')
-    .select('id, name, city, latitude, longitude, price_per_month, garage_options(option_key), slots(id, label, bookings(status)), reviews(rating)')
+    .select('id, name, city, latitude, longitude, price_per_month, photo_url, garage_options(option_key), slots(id, label, bookings(status, date_in, date_out)), reviews(rating)')
     .eq('status', 'published');
 
   if(error){ console.error(error); container.innerHTML = '<p class="sub">Impossible de charger les garages pour le moment.</p>'; return; }
@@ -810,21 +888,31 @@ async function fetchGarages(){
   GARAGES = (data || []).map(g => {
     const ratings = (g.reviews || []).map(r => r.rating);
     const avgRating = ratings.length ? (ratings.reduce((a,b)=>a+b,0)/ratings.length) : null;
-    const freeSlots = [], bookedSlots = [];
-    (g.slots || []).forEach(s => {
-      const isBooked = (s.bookings || []).some(b => b.status === 'confirmed' || b.status === 'pending');
-      (isBooked ? bookedSlots : freeSlots).push({ id:s.id, label:s.label });
-    });
     return {
-      id: g.id, name: g.name, loc: g.city, price: g.price_per_month,
+      id: g.id, name: g.name, loc: g.city, price: g.price_per_month, photoUrl: g.photo_url,
       latitude: g.latitude, longitude: g.longitude,
       distance: haversine(userCoords.lat, userCoords.lng, g.latitude, g.longitude),
       rating: avgRating, reviewsCount: ratings.length,
       options: (g.garage_options || []).map(o => o.option_key),
-      freeSlots, bookedSlots
+      allSlots: (g.slots || []).map(s => ({ id:s.id, label:s.label, bookings:s.bookings || [] }))
     };
   });
   runSearch();
+}
+
+// Une place est libre pour la période choisie si aucune réservation
+// confirmée/en attente ne chevauche ces dates.
+function slotsForPeriod(garage, dateIn, dateOut){
+  const freeSlots = [], bookedSlots = [];
+  garage.allSlots.forEach(s => {
+    const overlap = (s.bookings || []).some(b => {
+      if(b.status !== 'confirmed' && b.status !== 'pending') return false;
+      if(!dateIn || !dateOut) return true; // pas de dates choisies -> place considérée occupée si une résa active existe
+      return b.date_in < dateOut && b.date_out > dateIn;
+    });
+    (overlap ? bookedSlots : freeSlots).push({ id:s.id, label:s.label });
+  });
+  return { freeSlots, bookedSlots };
 }
 
 function useMyLocation(){
@@ -848,8 +936,16 @@ function runSearch(){
   const sort = document.getElementById('s-sort').value;
   const activeOpts = [...document.querySelectorAll('.s-opt:checked')].map(c=>c.value);
   const locText = document.getElementById('s-location').value.trim().toLowerCase().split(',')[0].trim();
+  const dateIn = document.getElementById('s-date-in').value;
+  const dateOut = document.getElementById('s-date-out').value;
 
-  let list = GARAGES.filter(g => g.distance <= radius && g.price <= budget);
+  let list = GARAGES
+    .map(g => {
+      const { freeSlots, bookedSlots } = slotsForPeriod(g, dateIn, dateOut);
+      return Object.assign({}, g, { freeSlots, bookedSlots });
+    })
+    .filter(g => g.distance <= radius && g.price <= budget && g.freeSlots.length > 0);
+
   if(activeOpts.length){
     list = list.filter(g => activeOpts.every(o => g.options.includes(o)));
   }
@@ -860,11 +956,13 @@ function runSearch(){
   if(sort === 'price') list.sort((a,b)=>a.price-b.price);
   if(sort === 'rating') list.sort((a,b)=>(b.rating||0)-(a.rating||0));
 
+  window.currentResults = list;
   document.getElementById('results-count').textContent = list.length + (list.length>1 ? ' places trouvées' : ' place trouvée');
   const container = document.getElementById('results-list');
 
   if(!list.length){
-    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Aucune place ne correspond</h3><p>Essaie d\'élargir le rayon de recherche, ou aucun garage n\'est encore publié dans ce secteur.</p></div>';
+    container.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Aucune place ne correspond</h3><p>Essaie d\'élargir le rayon de recherche, les dates, ou aucun garage n\'est encore publié dans ce secteur.</p></div>';
+    if(window.resultsMap) window.resultsMap.eachLayer(l => { if(l instanceof L.Marker) window.resultsMap.removeLayer(l); });
     return;
   }
 
@@ -873,8 +971,9 @@ function runSearch(){
     const checked = compareIds.includes(g.id) ? 'checked' : '';
     const ratingText = g.rating ? (g.rating.toFixed(1) + ' ★ (' + g.reviewsCount + ' avis)') : 'Pas encore d\'avis';
     const distText = g.distance < 999 ? g.distance.toFixed(1).replace('.0','') + ' km' : 'distance inconnue';
+    const thumbStyle = g.photoUrl ? ' style="background-image:url(\''+g.photoUrl+'\')"' : '';
     return '<div class="result-card">'
-      + '<div class="result-main"><div class="result-thumb"></div>'
+      + '<div class="result-main"><div class="result-thumb"'+thumbStyle+'></div>'
       + '<div class="result-info"><h3>'+g.name+'</h3>'
       + '<div class="meta">'+g.loc+' - '+distText+' - '+ratingText+'</div>'
       + '<div class="result-tags">'+tags+'</div></div></div>'
@@ -884,6 +983,41 @@ function runSearch(){
       + '<label class="compare-check"><input type="checkbox" '+checked+' onchange="toggleCompareId(\'' + g.id + '\',this.checked)"> Comparer</label>'
       + '</div></div>';
   }).join('');
+
+  renderResultsMap(list);
+}
+
+function setResultsView(view){
+  document.getElementById('view-btn-list').classList.toggle('active', view==='list');
+  document.getElementById('view-btn-map').classList.toggle('active', view==='map');
+  document.getElementById('results-list').style.display = view==='list' ? 'block' : 'none';
+  document.getElementById('results-map').style.display = view==='map' ? 'block' : 'none';
+  if(view==='map' && window.resultsMap) setTimeout(()=>window.resultsMap.invalidateSize(), 50);
+}
+
+function renderResultsMap(list){
+  if(!window.L) return;
+  if(!window.resultsMap){
+    window.resultsMap = L.map('results-map');
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap'
+    }).addTo(window.resultsMap);
+  }
+  const map = window.resultsMap;
+  if(window.resultMarkers) window.resultMarkers.forEach(m => map.removeLayer(m));
+  window.resultMarkers = [];
+
+  const withCoords = list.filter(g => g.latitude != null && g.longitude != null);
+  withCoords.forEach(g => {
+    const marker = L.marker([g.latitude, g.longitude]).addTo(map);
+    marker.bindPopup('<div class="map-popup"><h4>'+g.name+'</h4><p>'+g.price+' €/mois</p><button class="btn small primary" onclick="openBooking(\''+g.id+'\')">Réserver</button></div>');
+    window.resultMarkers.push(marker);
+  });
+  if(withCoords.length){
+    map.fitBounds(withCoords.map(g=>[g.latitude,g.longitude]), { padding:[30,30], maxZoom:13 });
+  } else {
+    map.setView([userCoords.lat, userCoords.lng], 11);
+  }
 }
 
 function toggleCompareId(id, checked){
@@ -957,11 +1091,30 @@ async function loadOwnerGarages(){
   }).join('');
 }
 
+async function geocodeCity(city){
+  try {
+    const res = await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(city));
+    const results = await res.json();
+    if(results && results[0]) return { lat: parseFloat(results[0].lat), lng: parseFloat(results[0].lon) };
+  } catch(e){ console.error('Géocodage impossible', e); }
+  return null;
+}
+
+async function uploadGaragePhoto(garageId, file){
+  if(!file) return null;
+  const path = garageId + '/' + Date.now() + '-' + file.name;
+  const { error } = await sb.storage.from('garage-photos').upload(path, file);
+  if(error){ console.error(error); return null; }
+  const { data } = sb.storage.from('garage-photos').getPublicUrl(path);
+  return data.publicUrl;
+}
+
 async function createGarage(){
   const name = document.getElementById('ng-name').value.trim();
   const city = document.getElementById('ng-city').value.trim();
   const price = parseFloat(document.getElementById('ng-price').value);
   const slotCount = parseInt(document.getElementById('ng-slots').value) || 0;
+  const photoFile = document.getElementById('ng-photo').files[0];
   const errEl = document.getElementById('ng-error');
 
   if(!name || !city || !price || slotCount < 1){
@@ -972,11 +1125,21 @@ async function createGarage(){
   const { data: { user } } = await sb.auth.getUser();
   if(!user) return;
 
+  const coords = await geocodeCity(city);
+
   const { data: garage, error } = await sb.from('garages')
-    .insert({ owner_id:user.id, name, city, price_per_month:price, status:'pending' })
+    .insert({
+      owner_id:user.id, name, city, price_per_month:price, status:'pending',
+      latitude: coords ? coords.lat : null, longitude: coords ? coords.lng : null
+    })
     .select().single();
 
   if(error){ errEl.textContent = 'Erreur : ' + error.message; errEl.style.display='block'; return; }
+
+  if(photoFile){
+    const photoUrl = await uploadGaragePhoto(garage.id, photoFile);
+    if(photoUrl) await sb.from('garages').update({ photo_url: photoUrl }).eq('id', garage.id);
+  }
 
   const slotRows = Array.from({length:slotCount}, (_,i) => ({ garage_id:garage.id, label:String(i+1) }));
   await sb.from('slots').insert(slotRows);
@@ -1024,8 +1187,10 @@ async function loadOwnerBookings(){
 
   const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
   const rows = mine.map(b => {
-    const badge = b.status==='confirmed' ? '<span class="badge ok">Confirmée</span>' : b.status==='disputed' ? '<span class="badge flag">Litige</span>' : '<span class="badge pending">En attente</span>';
-    const action = b.status==='pending' ? '<button class="btn small primary" onclick="setBookingStatus(\''+b.id+'\',\'confirmed\')">Confirmer</button>' : '<button class="btn small ghost">État des lieux</button>';
+    const badge = b.status==='confirmed' ? '<span class="badge ok">Confirmée</span>' : b.status==='disputed' ? '<span class="badge flag">Litige</span>' : b.status==='rejected' ? '<span class="badge">Refusée</span>' : '<span class="badge pending">En attente</span>';
+    const action = b.status==='pending'
+      ? '<button class="btn small primary" onclick="setBookingStatus(\''+b.id+'\',\'confirmed\')">Confirmer</button> <button class="btn small ghost" onclick="setBookingStatus(\''+b.id+'\',\'rejected\')">Refuser</button>'
+      : '<button class="btn small ghost" onclick="openInspection(\''+b.id+'\')">État des lieux</button> <button class="btn small ghost" onclick="openMessages(\''+b.id+'\')">Messages</button>';
     return '<tr><td>'+b.slots.garages.name+'</td><td>n°'+b.slots.label+'</td><td>'+b.moto_model+'</td><td>'+fmtDate(b.date_in)+' → '+fmtDate(b.date_out)+'</td><td>'+badge+'</td><td>'+action+'</td></tr>';
   }).join('');
   container.innerHTML = '<table><tr><th>Garage</th><th>Place</th><th>Moto</th><th>Période</th><th>Statut</th><th></th></tr>'+rows+'</table>';
@@ -1061,6 +1226,130 @@ async function loadOwnerRevenue(){
   document.getElementById('owner-revenue-table').innerHTML = mine.length
     ? '<p class="sub">Détail par réservation disponible dans l\'onglet Réservations.</p>'
     : '<p class="sub">Aucun revenu enregistré pour le moment.</p>';
+}
+
+/* ETAT DES LIEUX */
+let activeInspectionBooking = null;
+
+async function openInspection(bookingId){
+  activeInspectionBooking = bookingId;
+  document.getElementById('inspection-overlay').classList.add('open');
+  await loadInspectionPhotos();
+}
+
+async function loadInspectionPhotos(){
+  const { data, error } = await sb
+    .from('inspection_photos')
+    .select('kind, photo_url, created_at')
+    .eq('booking_id', activeInspectionBooking)
+    .order('created_at', { ascending:false });
+
+  const render = async (kind) => {
+    const el = document.getElementById('inspection-'+kind);
+    if(error){ el.innerHTML = '<p class="sub">Erreur de chargement.</p>'; return; }
+    const photos = (data||[]).filter(p=>p.kind===kind);
+    if(!photos.length){ el.innerHTML = '<p class="sub" style="font-size:12px;">Aucune photo</p>'; return; }
+    const imgs = await Promise.all(photos.map(async p => {
+      const { data: signed } = await sb.storage.from('inspection-photos').createSignedUrl(p.photo_url, 3600);
+      return signed ? '<img src="'+signed.signedUrl+'" style="width:100%;border-radius:6px;margin-bottom:6px;">' : '';
+    }));
+    el.innerHTML = imgs.join('');
+  };
+  await render('checkin'); await render('checkout');
+}
+
+async function uploadInspection(kind){
+  const fileInput = document.getElementById('inspection-file-'+kind);
+  const file = fileInput.files[0];
+  if(!file || !activeInspectionBooking) return;
+  const { data: { user } } = await sb.auth.getUser();
+  const path = activeInspectionBooking + '/' + kind + '-' + Date.now() + '-' + file.name;
+  const { error: upErr } = await sb.storage.from('inspection-photos').upload(path, file);
+  if(upErr){ alert('Erreur d\'upload : ' + upErr.message); return; }
+  await sb.from('inspection_photos').insert({
+    booking_id: activeInspectionBooking, kind, photo_url: path, uploaded_by: user.id
+  });
+  fileInput.value = '';
+  await loadInspectionPhotos();
+}
+
+/* VERIFICATION D'IDENTITE */
+async function openIdentityModal(){
+  document.getElementById('identity-overlay').classList.add('open');
+  closeDropdown();
+  const { data: { user } } = await sb.auth.getUser();
+  const { data: profile } = await sb.from('profiles').select('is_verified').eq('id', user.id).single();
+  const { data: docs } = await sb.from('identity_documents').select('status, submitted_at').eq('user_id', user.id).order('submitted_at', { ascending:false }).limit(1);
+
+  const statusEl = document.getElementById('identity-status');
+  if(profile && profile.is_verified){
+    statusEl.innerHTML = '<span class="badge ok">Identité vérifiée</span>';
+  } else if(docs && docs[0]){
+    const s = docs[0].status;
+    statusEl.innerHTML = s==='rejected'
+      ? '<span class="badge flag">Document refusé - envoie un nouveau document</span>'
+      : '<span class="badge pending">Document en cours de vérification</span>';
+  } else {
+    statusEl.innerHTML = '<p class="sub">Aucun document envoyé pour le moment.</p>';
+  }
+}
+
+async function uploadIdentityDocument(){
+  const file = document.getElementById('identity-file').files[0];
+  if(!file) return;
+  const { data: { user } } = await sb.auth.getUser();
+  const path = user.id + '/' + Date.now() + '-' + file.name;
+  const { error: upErr } = await sb.storage.from('identity-documents').upload(path, file);
+  if(upErr){ alert('Erreur d\'upload : ' + upErr.message); return; }
+  const { error } = await sb.from('identity_documents').insert({ user_id:user.id, document_url:path });
+  if(error){ alert('Erreur : ' + error.message); return; }
+  document.getElementById('identity-file').value = '';
+  await openIdentityModal();
+}
+
+/* MESSAGERIE */
+let activeBookingId = null;
+
+async function openMessages(bookingId){
+  activeBookingId = bookingId;
+  document.getElementById('messages-overlay').classList.add('open');
+  await loadMessages();
+}
+function closeMessages(){
+  document.getElementById('messages-overlay').classList.remove('open');
+  activeBookingId = null;
+}
+
+async function loadMessages(){
+  const thread = document.getElementById('messages-thread');
+  thread.innerHTML = '<p class="sub">Chargement...</p>';
+  const { data: { user } } = await sb.auth.getUser();
+  const { data, error } = await sb
+    .from('messages')
+    .select('id, content, sender_id, created_at')
+    .eq('booking_id', activeBookingId)
+    .order('created_at', { ascending:true });
+
+  if(error){ thread.innerHTML = '<p class="sub">Impossible de charger la conversation.</p>'; return; }
+  if(!data || !data.length){ thread.innerHTML = '<p class="sub">Aucun message pour le moment. Écris le premier !</p>'; return; }
+
+  thread.innerHTML = data.map(m => {
+    const mine = m.sender_id === user.id;
+    const time = new Date(m.created_at).toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit' });
+    return '<div class="msg-bubble '+(mine?'mine':'theirs')+'">'+m.content+'<div class="msg-time">'+time+'</div></div>';
+  }).join('');
+  thread.scrollTop = thread.scrollHeight;
+}
+
+async function sendMessage(){
+  const input = document.getElementById('message-input');
+  const content = input.value.trim();
+  if(!content || !activeBookingId) return;
+  const { data: { user } } = await sb.auth.getUser();
+  const { error } = await sb.from('messages').insert({ booking_id:activeBookingId, sender_id:user.id, content });
+  if(error){ alert('Erreur : ' + error.message); return; }
+  input.value = '';
+  await loadMessages();
 }
 
 /* ADMIN GOD MODE (aucune donnée personnelle) */
@@ -1137,11 +1426,53 @@ async function loadAdminDisputes(){
     const garageName = d.slots && d.slots.garages ? d.slots.garages.name : 'Garage';
     const slotLabel = d.slots ? d.slots.label : '-';
     return '<div class="card"><div class="card-row"><div><h3>'+garageName+' - place n°'+slotLabel+'</h3>'
-      + '<div class="meta">Réservation #'+d.id.slice(0,8)+'</div></div><span class="badge flag">Ouvert</span></div></div>';
+      + '<div class="meta">Réservation #'+d.id.slice(0,8)+'</div></div><span class="badge flag">Ouvert</span></div>'
+      + '<div style="margin-top:10px;display:flex;gap:8px;">'
+      + '<button class="btn small ghost" onclick="openInspection(\''+d.id+'\')">Comparer les photos</button>'
+      + '<button class="btn small primary" onclick="setBookingStatus(\''+d.id+'\',\'confirmed\'); loadAdminDisputes();">Marquer comme résolu</button>'
+      + '</div></div>';
   }).join('');
 }
 
-/* CARROUSEL D'AVIS */
+async function loadAdminVerifications(){
+  const el = document.getElementById('admin-verifications-list');
+  const { data, error } = await sb
+    .from('identity_documents')
+    .select('id, status, submitted_at, user_id')
+    .eq('status', 'pending')
+    .order('submitted_at', { ascending:true });
+
+  if(error){ el.innerHTML = '<p class="sub">Erreur : ' + error.message + '</p>'; return; }
+  if(!data || !data.length){
+    el.innerHTML = '<div class="empty-state"><div class="icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div><h3>Aucune vérification en attente</h3><p>Les documents envoyés par les utilisateurs apparaîtront ici.</p></div>';
+    return;
+  }
+
+  el.innerHTML = data.map(d => {
+    const date = new Date(d.submitted_at).toLocaleDateString('fr-FR');
+    return '<div class="card"><div class="card-row"><div><h3>Document #'+d.id.slice(0,8)+'</h3>'
+      + '<div class="meta">Envoyé le '+date+'</div></div><span class="badge pending">En attente</span></div>'
+      + '<div style="margin-top:10px;display:flex;gap:8px;">'
+      + '<button class="btn small ghost" onclick="viewIdentityDoc(\''+d.id+'\')">Voir le document</button>'
+      + '<button class="btn small primary" onclick="reviewIdentity(\''+d.id+'\',\'verified\')">Valider</button>'
+      + '<button class="btn small ghost" onclick="reviewIdentity(\''+d.id+'\',\'rejected\')">Refuser</button>'
+      + '</div></div>';
+  }).join('');
+}
+
+async function viewIdentityDoc(docId){
+  const { data } = await sb.from('identity_documents').select('document_url').eq('id', docId).single();
+  if(!data) return;
+  const { data: signed } = await sb.storage.from('identity-documents').createSignedUrl(data.document_url, 300);
+  if(signed) window.open(signed.signedUrl, '_blank');
+}
+
+async function reviewIdentity(docId, status){
+  const { error } = await sb.rpc('admin_review_identity', { doc_id:docId, new_status:status });
+  if(error){ alert('Erreur : ' + error.message); return; }
+  loadAdminVerifications();
+}
+
 /* CARROUSEL D'AVIS (données réelles) */
 async function loadHeroReviews(){
   const { data, error } = await sb
@@ -1185,8 +1516,10 @@ let bookingState = { garage:'', loc:'', baseRate:45, slot:null };
 
 function openBooking(garageId){
   if(!window.currentRole){ openAuth('signup','client'); return; }
-  const g = GARAGES.find(x => x.id === garageId);
+  const g = (window.currentResults || []).find(x => x.id === garageId) || GARAGES.find(x => x.id === garageId);
   if(!g) return;
+  const freeSlots = g.freeSlots || [];
+  const bookedSlots = g.bookedSlots || [];
   bookingState = { garageId:g.id, garage:g.name, loc:g.loc + (g.distance<999 ? (' - ' + g.distance.toFixed(1).replace('.0','') + ' km') : ''), baseRate:g.price, slotId:null, slotLabel:null };
 
   document.getElementById('book-title').textContent = 'Réserver - ' + g.name;
@@ -1197,8 +1530,8 @@ function openBooking(garageId){
     ? g.options.map(o => '<span class="tag">'+OPTION_LABELS[o]+'</span>').join('')
     : '<span class="tag">Stockage simple, sans option supplémentaire</span>';
 
-  const slotsHtml = g.freeSlots.map(s => '<div class="slot-tile free" data-slot-id="'+s.id+'" onclick="pickSlot(this)">'+s.label+'</div>').join('')
-    + g.bookedSlots.map(s => '<div class="slot-tile booked">'+s.label+'</div>').join('');
+  const slotsHtml = freeSlots.map(s => '<div class="slot-tile free" data-slot-id="'+s.id+'" onclick="pickSlot(this)">'+s.label+'</div>').join('')
+    + bookedSlots.map(s => '<div class="slot-tile booked">'+s.label+'</div>').join('');
   document.getElementById('book-slots').innerHTML = slotsHtml || '<p class="sub">Aucune place configurée pour ce garage pour le moment.</p>';
 
   document.getElementById('client-book').closest('.main').querySelectorAll('.tabpanel').forEach(p=>p.classList.remove('active'));
@@ -1316,7 +1649,7 @@ async function loadClientBookings(){
     return;
   }
 
-  const badgeFor = s => s==='confirmed' ? '<span class="badge ok">Confirmée</span>' : s==='disputed' ? '<span class="badge flag">Litige</span>' : s==='cancelled' ? '<span class="badge">Annulée</span>' : '<span class="badge pending">En attente de confirmation propriétaire</span>';
+  const badgeFor = s => s==='confirmed' ? '<span class="badge ok">Confirmée</span>' : s==='disputed' ? '<span class="badge flag">Litige</span>' : s==='cancelled' ? '<span class="badge">Annulée</span>' : s==='rejected' ? '<span class="badge">Refusée par le propriétaire</span>' : '<span class="badge pending">En attente de confirmation propriétaire</span>';
   const fmtDate = s => { const [y,m,d]=s.split('-'); return d+'/'+m+'/'+y; };
 
   container.innerHTML = data.map(b => {
@@ -1325,7 +1658,8 @@ async function loadClientBookings(){
     return '<div class="card"><div class="card-row"><div>'
       + '<h3>'+garageName+' - place n°'+slotLabel+'</h3>'
       + '<div class="meta">'+fmtDate(b.date_in)+' → '+fmtDate(b.date_out)+' · '+b.moto_model+'</div></div>'
-      + badgeFor(b.status) + '</div></div>';
+      + badgeFor(b.status) + '</div>'
+      + '<div style="margin-top:10px;display:flex;gap:8px;"><button class="btn small ghost" onclick="openInspection(\''+b.id+'\')">État des lieux</button><button class="btn small ghost" onclick="openMessages(\''+b.id+'\')">Messages</button></div></div>';
   }).join('');
 }
 </script>
